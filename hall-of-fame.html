@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hall of Fame — The 12 Chronicles</title>
+  <meta name="description" content="Collaborative travel photography gallery and digital scrapbook for 12 friends exploring Mumbai & IIT Bombay Techfest 2026." />
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#F7F4EC',
+            forest: { DEFAULT: '#354B3A', dark: '#243428', light: '#46624D' },
+            terracotta: { DEFAULT: '#C76B4A', dark: '#AB5636', light: '#D88467' },
+            olive: { DEFAULT: '#A4A88A', dark: '#8A8E71', light: '#C2C5AD' },
+            charcoal: { DEFAULT: '#282824', light: '#40403B', muted: '#6B6B63' }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-[#F7F4EC] text-[#282824] paper-texture flex flex-col min-h-screen">
+
+  <!-- Shared Global Navigation -->
+  <div id="global-nav"></div>
+
+  <!-- Header Banner -->
+  <section class="border-b border-[#A4A88A]/30 bg-white/50 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-[#C76B4A]">Shared Visual Journal</span>
+          <h1 class="font-serif text-3xl sm:text-5xl font-bold text-[#282824] mt-1">Hall of Fame</h1>
+          <p class="text-xs sm:text-sm text-[#282824]/70 mt-2 max-w-xl">
+            Unfiltered travel photography and memories taken through the lenses of all 12 squad members across Android, iPhone, and cameras.
+          </p>
+        </div>
+
+        <!-- Upload Button -->
+        <div>
+          <button id="open-upload-modal-btn" 
+                  class="px-5 py-2.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-xs font-bold tracking-wide transition-all shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span>Upload Photos</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Gallery Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 space-y-10">
+    
+    <!-- Featured Moments Section -->
+    <div id="featured-memories-container"></div>
+
+    <!-- Filter Bar: Member, Day, Album, Favorites -->
+    <div class="bg-white p-4 rounded-2xl border border-[#A4A88A]/30 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Filter Member -->
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-[#A4A88A] mb-1">Squad Member</label>
+          <select id="filter-member" class="px-3 py-1.5 rounded-lg border border-[#A4A88A]/40 text-xs bg-[#F7F4EC] focus:outline-none focus:border-[#354B3A]">
+            <option value="all">All 12 Members</option>
+          </select>
+        </div>
+
+        <!-- Filter Day -->
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-[#A4A88A] mb-1">Trip Day</label>
+          <select id="filter-day" class="px-3 py-1.5 rounded-lg border border-[#A4A88A]/40 text-xs bg-[#F7F4EC] focus:outline-none focus:border-[#354B3A]">
+            <option value="all">All Days</option>
+            <option value="1">Day 1 (Dec 24)</option>
+            <option value="2">Day 2 (Dec 25)</option>
+            <option value="3">Day 3 (Dec 26)</option>
+            <option value="4">Day 4 (Dec 27)</option>
+            <option value="5">Day 5 (Dec 28)</option>
+          </select>
+        </div>
+
+        <!-- Filter Album -->
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-[#A4A88A] mb-1">Album</label>
+          <select id="filter-album" class="px-3 py-1.5 rounded-lg border border-[#A4A88A]/40 text-xs bg-[#F7F4EC] focus:outline-none focus:border-[#354B3A]">
+            <option value="all">All Albums</option>
+            <option value="Highlights">Highlights</option>
+            <option value="Techfest">Techfest</option>
+            <option value="Marine Drive">Marine Drive</option>
+            <option value="Food Trail">Food Trail</option>
+            <option value="Candid">Candid</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Favorites Toggle -->
+      <div>
+        <label class="block text-[10px] uppercase font-bold text-[#A4A88A] mb-1">Favorites</label>
+        <button id="filter-favorites-btn" 
+                class="px-3 py-1.5 rounded-lg border border-[#A4A88A]/40 text-xs font-semibold bg-white text-[#282824] hover:border-[#C76B4A] transition-all flex items-center gap-1.5">
+          <span>❤️</span>
+          <span>My Favorites</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Masonry Layout Container -->
+    <div id="gallery-grid" class="masonry-grid">
+      <!-- Populated dynamically by gallery.js -->
+    </div>
+  </main>
+
+  <!-- Upload Modal -->
+  <div id="upload-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop animate-fade-in">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#A4A88A]/30 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+        <h3 class="font-serif text-xl font-bold text-[#282824]">Add Photos to Hall of Fame</h3>
+        <button id="cancel-upload-btn" class="text-gray-400 hover:text-[#282824]">✕</button>
+      </div>
+
+      <form id="gallery-upload-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Choose Photo(s) *</label>
+          <input type="file" id="photo-file-input" accept="image/*" required 
+                 class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#354B3A]/10 file:text-[#354B3A] hover:file:bg-[#354B3A]/20 cursor-pointer" />
+          <div id="upload-preview" class="flex gap-2 overflow-x-auto mt-2"></div>
+        </div>
+
+        <!-- Upload Progress Indicator -->
+        <div id="upload-progress-wrap" class="hidden space-y-1">
+          <div class="flex justify-between text-[11px] font-semibold text-[#354B3A]">
+            <span>Uploading to Firebase Cloud Storage...</span>
+            <span id="upload-percent-text">100%</span>
+          </div>
+          <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+            <div id="upload-progress-bar" class="bg-[#354B3A] h-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Photo Title *</label>
+          <input id="upload-title" required placeholder="e.g. Sunset Tetrapods Laughs" 
+                 class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Trip Day</label>
+            <select id="upload-day" class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]">
+              <option value="1">Day 1 (Dec 24)</option>
+              <option value="2">Day 2 (Dec 25)</option>
+              <option value="3">Day 3 (Dec 26)</option>
+              <option value="4">Day 4 (Dec 27)</option>
+              <option value="5">Day 5 (Dec 28)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Album Collection</label>
+            <select id="upload-album" class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]">
+              <option value="Highlights">Highlights</option>
+              <option value="Techfest">Techfest</option>
+              <option value="Marine Drive">Marine Drive</option>
+              <option value="Food Trail">Food Trail</option>
+              <option value="Candid">Candid</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Uploaded By (Squad Member)</label>
+          <select id="upload-member-select" class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Story / Caption</label>
+          <textarea id="upload-caption" rows="3" placeholder="What happened in this moment? What made everyone laugh?" 
+                    class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]"></textarea>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="document.getElementById('upload-modal').classList.add('hidden')" 
+                  class="flex-1 py-2.5 rounded-lg border border-[#A4A88A]/40 font-semibold text-[#282824] hover:bg-gray-50">
+            Cancel
+          </button>
+          <button type="submit" 
+                  class="flex-1 py-2.5 rounded-lg bg-[#354B3A] hover:bg-[#243428] text-white font-semibold transition-colors">
+            Upload & Share
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Fullscreen Lightbox Modal -->
+  <div id="lightbox-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 modal-backdrop animate-fade-in">
+    <!-- Close button -->
+    <button id="lightbox-close" class="absolute top-4 right-4 z-50 text-white/80 hover:text-white p-2 text-2xl">✕</button>
+
+    <!-- Prev & Next Navigation Buttons -->
+    <button id="lightbox-prev" class="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-black/40 text-white hover:bg-black/70 backdrop-blur-sm transition-all" aria-label="Previous">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+    </button>
+    <button id="lightbox-next" class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-black/40 text-white hover:bg-black/70 backdrop-blur-sm transition-all" aria-label="Next">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+    </button>
+
+    <!-- Lightbox Main Frame -->
+    <div class="relative max-w-5xl w-full bg-[#282824] rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[92vh]">
+      <!-- Image side -->
+      <div class="flex-1 bg-black flex items-center justify-center min-h-[300px] md:min-h-[500px]">
+        <img id="lightbox-img" src="" alt="Fullscreen travel photo" class="max-h-[70vh] md:max-h-[85vh] w-auto max-w-full object-contain" />
+      </div>
+
+      <!-- Metadata side -->
+      <div class="w-full md:w-80 p-6 flex flex-col justify-between bg-[#282824] text-white border-t md:border-t-0 md:border-l border-white/10">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-[#C76B4A]">The 12 Chronicles</span>
+            <button id="lightbox-like-btn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold">
+              <span>❤️</span> <span>0</span>
+            </button>
+          </div>
+
+          <h3 id="lightbox-title" class="font-serif text-xl font-bold mt-2 leading-tight"></h3>
+          <p id="lightbox-caption" class="text-xs text-white/80 mt-2 leading-relaxed"></p>
+          <p id="lightbox-meta" class="text-[11px] text-white/50 mt-4 pt-3 border-t border-white/10"></p>
+        </div>
+
+        <div class="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
+          <button id="lightbox-download-btn" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-xs font-semibold transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <span>Download Photo</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Footer -->
+  <footer class="mt-20 border-t border-[#A4A88A]/30 bg-white/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between text-xs text-[#282824]/70">
+      <span>The 12 Chronicles • Mumbai 2026</span>
+      <button onclick="window.openFirebaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
+        🔥 Firebase Status: Sync Ready
+      </button>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/gallery.js"></script>
+</body>
+</html>

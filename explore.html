@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mumbai Explorer — The 12 Chronicles</title>
+  <meta name="description" content="Curated destinations, architectural landmarks, and coastal spots for 12 friends exploring Mumbai in 2026." />
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#F7F4EC',
+            forest: { DEFAULT: '#354B3A', dark: '#243428', light: '#46624D' },
+            terracotta: { DEFAULT: '#C76B4A', dark: '#AB5636', light: '#D88467' },
+            olive: { DEFAULT: '#A4A88A', dark: '#8A8E71', light: '#C2C5AD' },
+            charcoal: { DEFAULT: '#282824', light: '#40403B', muted: '#6B6B63' }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-[#F7F4EC] text-[#282824] paper-texture flex flex-col min-h-screen">
+
+  <!-- Shared Global Navigation -->
+  <div id="global-nav"></div>
+
+  <!-- Header Banner -->
+  <section class="border-b border-[#A4A88A]/30 bg-white/50 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-[#C76B4A]">City Atlas</span>
+          <h1 class="font-serif text-3xl sm:text-5xl font-bold text-[#282824] mt-1">Mumbai Explorer</h1>
+          <p class="text-xs sm:text-sm text-[#282824]/70 mt-2 max-w-xl">
+            Curated handbook of must-visit landmarks, historic monuments, and coastal promenades for our 12 squad members.
+          </p>
+        </div>
+
+        <!-- Exploration Progress Indicator -->
+        <div id="explorer-stats"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Grid & Filters -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 space-y-8">
+    
+    <!-- Filter bar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- Category Pills -->
+      <div id="category-filters" class="flex flex-wrap items-center gap-2">
+        <button data-cat="all" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#354B3A] text-white shadow-sm transition-all">
+          All Spots
+        </button>
+        <button data-cat="Campus" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-[#282824] border border-[#A4A88A]/30 hover:border-[#354B3A] transition-all">
+          IIT Bombay
+        </button>
+        <button data-cat="Heritage" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-[#282824] border border-[#A4A88A]/30 hover:border-[#354B3A] transition-all">
+          Heritage
+        </button>
+        <button data-cat="Coastal" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-[#282824] border border-[#A4A88A]/30 hover:border-[#354B3A] transition-all">
+          Coastal & Sea
+        </button>
+        <button data-cat="visited" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-[#282824] border border-[#A4A88A]/30 hover:border-[#354B3A] transition-all">
+          ✓ Visited
+        </button>
+        <button data-cat="unvisited" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-[#282824] border border-[#A4A88A]/30 hover:border-[#354B3A] transition-all">
+          ○ Yet to Visit
+        </button>
+      </div>
+
+      <!-- Search Input -->
+      <div class="relative w-full md:w-72">
+        <input id="explore-search" type="text" placeholder="Search destinations or tips..." 
+               class="w-full px-3.5 py-2 pl-9 rounded-xl border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A] bg-white" />
+        <svg class="w-4 h-4 text-[#A4A88A] absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Destinations Grid -->
+    <div id="destinations-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Populated dynamically by explore.js -->
+    </div>
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="mt-20 border-t border-[#A4A88A]/30 bg-white/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between text-xs text-[#282824]/70">
+      <span>The 12 Chronicles • Mumbai 2026</span>
+      <button onclick="window.openFirebaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
+        🔥 Firebase Status: Sync Ready
+      </button>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/explore.js"></script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trip Memories & Wrapped — The 12 Chronicles</title>
+  <meta name="description" content="Digital scrapbook, post-trip memory board, and Trip Wrapped statistics for 12 friends." />
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#F7F4EC',
+            forest: { DEFAULT: '#354B3A', dark: '#243428', light: '#46624D' },
+            terracotta: { DEFAULT: '#C76B4A', dark: '#AB5636', light: '#D88467' },
+            olive: { DEFAULT: '#A4A88A', dark: '#8A8E71', light: '#C2C5AD' },
+            charcoal: { DEFAULT: '#282824', light: '#40403B', muted: '#6B6B63' }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-[#F7F4EC] text-[#282824] paper-texture flex flex-col min-h-screen">
+
+  <!-- Shared Global Navigation -->
+  <div id="global-nav"></div>
+
+  <!-- Header Banner -->
+  <section class="border-b border-[#A4A88A]/30 bg-white/50 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-[#C76B4A]">Digital Scrapbook</span>
+          <h1 class="font-serif text-3xl sm:text-5xl font-bold text-[#282824] mt-1">Trip Memories & Wrapped</h1>
+          <p class="text-xs sm:text-sm text-[#282824]/70 mt-2 max-w-xl">
+            Our permanent time capsule. Commemorating the laughter, late nights, tech breakthroughs, and bonds made in Mumbai.
+          </p>
+        </div>
+
+        <button onclick="window.print()" 
+                class="px-4 py-2.5 rounded-xl border border-[#A4A88A]/40 bg-white text-[#282824] text-xs font-semibold hover:border-[#354B3A] transition-all flex items-center gap-2 shadow-sm self-start md:self-auto">
+          <svg class="w-4 h-4 text-[#354B3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          <span>Print / Save Scrapbook</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 space-y-12 w-full">
+    
+    <!-- TRIP WRAPPED 2026 STATS -->
+    <section>
+      <div class="text-center max-w-xl mx-auto mb-8">
+        <span class="text-xs uppercase font-bold tracking-widest text-[#C76B4A]">Official Retrospective</span>
+        <h2 class="font-serif text-3xl font-bold text-[#282824] mt-1">Trip Wrapped: Mumbai 2026</h2>
+        <p class="text-xs text-[#282824]/70 mt-1">The final numbers behind the journey of a lifetime.</p>
+      </div>
+
+      <div id="wrapped-stats-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <!-- Populated dynamically by memories.js -->
+      </div>
+    </section>
+
+    <!-- Superlatives of the Trip -->
+    <section class="journal-card p-8 bg-white border border-[#A4A88A]/30">
+      <div class="mb-6 pb-2 border-b border-[#A4A88A]/20">
+        <span class="text-xs uppercase font-bold tracking-wider text-[#C76B4A]">Hall of Accolades</span>
+        <h3 class="font-serif text-2xl font-bold text-[#282824]">Squad Superlatives</h3>
+        <p class="text-xs text-[#282824]/70 mt-0.5">Voted unreservedly by all 12 friends on the final train journey back.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        <div class="p-4 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20">
+          <span class="text-xl block mb-1">🍔</span>
+          <h4 class="font-serif font-bold text-sm text-[#282824]">Ultimate Street Gourmet</h4>
+          <p class="text-[#354B3A] font-semibold mt-0.5">Awarded to: Rohan Mehta</p>
+          <p class="text-[11px] text-[#282824]/70 mt-1">For finding authentic bun maska and spicy misal pav within 10 minutes of arriving anywhere.</p>
+        </div>
+
+        <div class="p-4 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20">
+          <span class="text-xl block mb-1">📸</span>
+          <h4 class="font-serif font-bold text-sm text-[#282824]">Golden Hour Champion</h4>
+          <p class="text-[#354B3A] font-semibold mt-0.5">Awarded to: Ananya Iyer</p>
+          <p class="text-[11px] text-[#282824]/70 mt-1">For capturing 350+ candid moments without ever making anyone pose stiffly.</p>
+        </div>
+
+        <div class="p-4 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20">
+          <span class="text-xl block mb-1">🤖</span>
+          <h4 class="font-serif font-bold text-sm text-[#282824]">IITB Robotics Gladiator</h4>
+          <p class="text-[#354B3A] font-semibold mt-0.5">Awarded to: Vihaan Joshi</p>
+          <p class="text-[11px] text-[#282824]/70 mt-1">For repairing the fighting bot motor 14 minutes before the Techfest quarterfinals.</p>
+        </div>
+
+        <div class="p-4 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20">
+          <span class="text-xl block mb-1">🌙</span>
+          <h4 class="font-serif font-bold text-sm text-[#282824]">Guardian of Marine Drive</h4>
+          <p class="text-[#354B3A] font-semibold mt-0.5">Awarded to: Dev Malhotra</p>
+          <p class="text-[11px] text-[#282824]/70 mt-1">For refusing to let anyone go to sleep before watching the sea breeze at 3:30 AM.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Group Memory Board -->
+    <section class="space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-wider text-[#C76B4A]">Shared Keepsake</span>
+          <h3 class="font-serif text-2xl font-bold text-[#282824]">Group Memory Board</h3>
+          <p class="text-xs text-[#282824]/70 mt-0.5">Leave notes, thank-yous, and personal highlights from the trip.</p>
+        </div>
+      </div>
+
+      <!-- Add Note Form -->
+      <form id="add-memory-form" class="journal-card p-4 sm:p-5 bg-white border border-[#A4A88A]/30 flex flex-col sm:flex-row gap-3">
+        <textarea id="memory-note-text" required rows="2" 
+                  placeholder="Share a favorite memory, inside joke, or message to the squad..." 
+                  class="flex-1 px-3 py-2 text-xs rounded-xl border border-[#A4A88A]/40 focus:outline-none focus:border-[#354B3A] bg-[#F7F4EC]"></textarea>
+        <button type="submit" 
+                class="px-5 py-2.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-xs font-semibold self-end sm:self-center transition-colors shadow-sm">
+          Post Note
+        </button>
+      </form>
+
+      <!-- Notes Grid -->
+      <div id="memory-board-list" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Populated dynamically by memories.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="mt-20 border-t border-[#A4A88A]/30 bg-white/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between text-xs text-[#282824]/70">
+      <span>The 12 Chronicles • Mumbai 2026</span>
+      <button onclick="window.openFirebaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
+        🔥 Firebase Status: Sync Ready
+      </button>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/memories.js"></script>
+</body>
+</html>

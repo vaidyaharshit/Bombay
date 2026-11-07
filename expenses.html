@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Group Expenses — The 12 Chronicles</title>
+  <meta name="description" content="Collaborative expense tracking and smart debt settlement for 12 friends travelling to IIT Bombay Techfest & Mumbai 2026." />
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#F7F4EC',
+            forest: { DEFAULT: '#354B3A', dark: '#243428', light: '#46624D' },
+            terracotta: { DEFAULT: '#C76B4A', dark: '#AB5636', light: '#D88467' },
+            olive: { DEFAULT: '#A4A88A', dark: '#8A8E71', light: '#C2C5AD' },
+            charcoal: { DEFAULT: '#282824', light: '#40403B', muted: '#6B6B63' }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-[#F7F4EC] text-[#282824] paper-texture flex flex-col min-h-screen">
+
+  <!-- Shared Global Navigation -->
+  <div id="global-nav"></div>
+
+  <!-- Header Banner -->
+  <section class="border-b border-[#A4A88A]/30 bg-white/50 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-[#C76B4A]">Shared Financial Ledger</span>
+          <h1 class="font-serif text-3xl sm:text-5xl font-bold text-[#282824] mt-1">Group Expenses</h1>
+          <p class="text-xs sm:text-sm text-[#282824]/70 mt-2 max-w-xl">
+            Clean, zero-friction shared expense tracking for all 12 members with instant debt simplification and minimum settlements.
+          </p>
+        </div>
+
+        <div>
+          <button id="open-add-expense-btn" 
+                  class="px-5 py-2.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-xs font-bold tracking-wide transition-all shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <span>Add Expense</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 space-y-10 w-full">
+    
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <div class="journal-card p-6 bg-white border border-[#A4A88A]/30 flex flex-col justify-between">
+        <div>
+          <span class="text-[11px] uppercase tracking-wider font-bold text-[#A4A88A]">Total Trip Spending</span>
+          <h3 id="total-trip-expenses" class="font-serif text-3xl sm:text-4xl font-bold text-[#282824] mt-1">₹0</h3>
+        </div>
+        <span class="text-xs text-[#282824]/60 mt-3 pt-3 border-t border-[#A4A88A]/20">Across all categories & bookings</span>
+      </div>
+
+      <div class="journal-card p-6 bg-white border border-[#A4A88A]/30 flex flex-col justify-between">
+        <div>
+          <span class="text-[11px] uppercase tracking-wider font-bold text-[#A4A88A]">Per Person Average</span>
+          <h3 id="per-person-avg" class="font-serif text-3xl sm:text-4xl font-bold text-[#354B3A] mt-1">₹0</h3>
+        </div>
+        <span class="text-xs text-[#282824]/60 mt-3 pt-3 border-t border-[#A4A88A]/20">Fair share across 12 squad members</span>
+      </div>
+
+      <div class="journal-card p-6 bg-white border border-[#A4A88A]/30 flex flex-col justify-between">
+        <div>
+          <span class="text-[11px] uppercase tracking-wider font-bold text-[#A4A88A]">Your Current Balance</span>
+          <div id="user-balance" class="font-serif text-2xl sm:text-3xl font-bold mt-1">
+            <span class="text-[#282824]">₹0</span>
+          </div>
+        </div>
+        <span class="text-xs text-[#282824]/60 mt-3 pt-3 border-t border-[#A4A88A]/20">Based on your active squad identity</span>
+      </div>
+
+    </div>
+
+    <!-- Smart Debt Settlement Section -->
+    <section class="journal-card p-6 bg-white border border-[#A4A88A]/30">
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-[#A4A88A]/20">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-wider text-[#C76B4A]">Smart Settlement Algorithm</span>
+          <h2 class="font-serif text-xl font-bold text-[#282824]">Simplified Debts (Minimum Transfers)</h2>
+        </div>
+        <span class="text-xs text-[#A4A88A] hidden sm:inline">Calculates shortest path to settle all balances</span>
+      </div>
+
+      <div id="debts-summary-list" class="space-y-2.5">
+        <!-- Populated dynamically by expenses.js -->
+      </div>
+    </section>
+
+    <!-- Two-column grid: Expense History & Individual Balances -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Expense History (2 Cols) -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-serif text-xl font-bold text-[#282824]">Expense History</h3>
+          <span class="text-xs text-[#A4A88A]">Stored in Firestore</span>
+        </div>
+
+        <div id="expense-list" class="space-y-3">
+          <!-- Populated dynamically by expenses.js -->
+        </div>
+      </div>
+
+      <!-- Member Balances Grid (1 Col) -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-serif text-xl font-bold text-[#282824]">Squad Net Balances</h3>
+          <span class="text-xs text-[#A4A88A]">12 Friends</span>
+        </div>
+
+        <div id="member-balances-grid" class="space-y-2.5">
+          <!-- Populated dynamically by expenses.js -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Add Expense Modal -->
+  <div id="expense-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop animate-fade-in">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#A4A88A]/30 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+        <h3 class="font-serif text-xl font-bold text-[#282824]">Log New Group Expense</h3>
+        <button id="cancel-expense-btn" class="text-gray-400 hover:text-[#282824]">✕</button>
+      </div>
+
+      <form id="expense-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Expense Title *</label>
+          <input id="exp-title" required placeholder="e.g. Sardar Pav Bhaji Dinner" 
+                 class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Total Amount (₹) *</label>
+            <input type="number" id="exp-amount" min="1" step="any" required placeholder="e.g. 1850" 
+                   class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]" />
+          </div>
+          <div>
+            <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Category *</label>
+            <select id="exp-category" class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]">
+              <option value="Food">Food & Dining</option>
+              <option value="Travel">Travel & Transit</option>
+              <option value="Hotel">Hotel & Stay</option>
+              <option value="Sightseeing">Sightseeing & Tickets</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Who Paid? *</label>
+          <select id="exp-payer-select" class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="font-semibold uppercase tracking-wider text-[#A4A88A]">Split Between Members *</label>
+            <span class="text-[10px] text-[#354B3A] font-semibold">Equal Split</span>
+          </div>
+          <div id="split-members-checkboxes" class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/30">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-3">
+          <button type="button" onclick="document.getElementById('expense-modal').classList.add('hidden')" 
+                  class="flex-1 py-2.5 rounded-lg border border-[#A4A88A]/40 font-semibold text-[#282824] hover:bg-gray-50">
+            Cancel
+          </button>
+          <button type="submit" 
+                  class="flex-1 py-2.5 rounded-lg bg-[#354B3A] hover:bg-[#243428] text-white font-semibold transition-colors">
+            Save Expense
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shared Footer -->
+  <footer class="mt-20 border-t border-[#A4A88A]/30 bg-white/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between text-xs text-[#282824]/70">
+      <span>The 12 Chronicles • Mumbai 2026</span>
+      <button onclick="window.openFirebaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
+        🔥 Firebase Status: Sync Ready
+      </button>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/expenses.js"></script>
+</body>
+</html>

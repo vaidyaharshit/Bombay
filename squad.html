@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Squad — The 12 Chronicles</title>
+  <meta name="description" content="Meet the 12 friends travelling to IIT Bombay Techfest and exploring Mumbai in December 2026." />
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#F7F4EC',
+            forest: { DEFAULT: '#354B3A', dark: '#243428', light: '#46624D' },
+            terracotta: { DEFAULT: '#C76B4A', dark: '#AB5636', light: '#D88467' },
+            olive: { DEFAULT: '#A4A88A', dark: '#8A8E71', light: '#C2C5AD' },
+            charcoal: { DEFAULT: '#282824', light: '#40403B', muted: '#6B6B63' }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-[#F7F4EC] text-[#282824] paper-texture flex flex-col min-h-screen">
+
+  <!-- Shared Global Navigation -->
+  <div id="global-nav"></div>
+
+  <!-- Header Banner -->
+  <section class="border-b border-[#A4A88A]/30 bg-white/50 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-[#C76B4A]">The Fellowship</span>
+          <h1 class="font-serif text-3xl sm:text-5xl font-bold text-[#282824] mt-1">The Squad</h1>
+          <p class="text-xs sm:text-sm text-[#282824]/70 mt-2 max-w-xl">
+            12 distinct personalities, one shared mission. Meet the pilots, navigators, food critics, photographers, and coders.
+          </p>
+        </div>
+
+        <div class="text-xs text-[#282824]/70 bg-white px-4 py-2.5 rounded-xl border border-[#A4A88A]/30 flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#354B3A]"></span>
+          <span>12 Members Verified & Ready</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Grid Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full">
+    <div id="squad-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <!-- Populated dynamically by squad.js -->
+    </div>
+  </main>
+
+  <!-- Edit Profile Modal -->
+  <div id="edit-profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop animate-fade-in">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#A4A88A]/30">
+      <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+        <h3 class="font-serif text-xl font-bold text-[#282824]">Update My Squad Profile</h3>
+        <button id="cancel-edit-btn" class="text-gray-400 hover:text-[#282824]">✕</button>
+      </div>
+
+      <form id="edit-profile-form" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Squad Nickname *</label>
+          <input id="edit-nickname" required 
+                 class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]" />
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Designated Trip Role *</label>
+          <input id="edit-triprole" required 
+                 class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]" />
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Fun Fact / Signature Quote</label>
+          <textarea id="edit-funfact" rows="3" required
+                    class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]"></textarea>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="document.getElementById('edit-profile-modal').classList.add('hidden')" 
+                  class="flex-1 py-2.5 rounded-lg border border-[#A4A88A]/40 font-semibold text-[#282824] hover:bg-gray-50">
+            Cancel
+          </button>
+          <button type="submit" 
+                  class="flex-1 py-2.5 rounded-lg bg-[#354B3A] hover:bg-[#243428] text-white font-semibold transition-colors">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Shared Footer -->
+  <footer class="mt-20 border-t border-[#A4A88A]/30 bg-white/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between text-xs text-[#282824]/70">
+      <span>The 12 Chronicles • Mumbai 2026</span>
+      <button onclick="window.openFirebaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
+        🔥 Firebase Status: Sync Ready
+      </button>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/squad.js"></script>
+</body>
+</html>
