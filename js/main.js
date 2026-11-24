@@ -265,7 +265,7 @@
   }
 
   // Live Countdown Timer to IIT Bombay Techfest 2026
-  window.initCountdownTimer = function () {
+  function initCountdownTimer() {
     const daysEl = document.getElementById("countdown-days");
     const hoursEl = document.getElementById("countdown-hours");
     const minutesEl = document.getElementById("countdown-minutes");
@@ -302,7 +302,8 @@
     if (!window._countdownTimerInterval) {
       window._countdownTimerInterval = setInterval(update, 1000);
     }
-  };
+  }
+  window.initCountdownTimer = initCountdownTimer;
 
   // Supabase Configuration Modal
   window.openSupabaseSettingsModal = function () {
@@ -375,9 +376,9 @@
   }
 
   runWhenReady(function () {
-    initNavigation();
-    initCountdownTimer();
-    showStoredFlash();
+    try { initNavigation(); } catch (e) { console.error("Navigation init error:", e); }
+    try { initCountdownTimer(); } catch (e) { console.error("Countdown timer error:", e); }
+    try { showStoredFlash(); } catch (e) { console.error("Flash notice error:", e); }
 
     window.addEventListener("chronicles:authChanged", initNavigation);
     window.addEventListener("chronicles:membersChanged", initNavigation);

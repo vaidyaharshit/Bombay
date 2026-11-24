@@ -320,7 +320,13 @@
   }
 
   // Globally expose setMode for fail-safe inline click handlers
+  
+  // Globally expose core helpers for fail-safe inline handlers and external calls
   window.setAuthMode = setMode;
+  window.togglePasswordVisibility = togglePasswordVisibility;
+  window.handleAuthLogin = handleLogin;
+  window.validateInviteCode = validateInvite;
+
 
   function updateModeBadge() {
     if (!els.modeBadge) return;
@@ -337,15 +343,32 @@
     }
   }
 
+  
+  function togglePasswordVisibility(targetId, button, event) {
+    if (event) {
+      if (event._pwToggled) return;
+      event._pwToggled = true;
+      if (typeof event.preventDefault === "function") event.preventDefault();
+      if (typeof event.stopPropagation === "function") event.stopPropagation();
+    }
+    const id = targetId || (button && button.getAttribute("data-toggle-password"));
+    if (!id) return;
+    const input = document.getElementById(id);
+    if (!input) return;
+    const reveal = input.type === "password";
+    input.type = reveal ? "text" : "password";
+    const text = reveal ? "Hide" : "Show";
+    if (button) button.textContent = text;
+    document.querySelectorAll('[data-toggle-password="' + id + '"]').forEach(function (btn) {
+      btn.textContent = text;
+    });
+  }
+
   function wirePasswordToggles() {
     document.querySelectorAll("[data-toggle-password]").forEach(function (button) {
-      button.addEventListener("click", function () {
-        const input = document.getElementById(button.getAttribute("data-toggle-password"));
-        if (!input) return;
-        const reveal = input.type === "password";
-        input.type = reveal ? "text" : "password";
-        button.textContent = reveal ? "Hide" : "Show";
-      });
+      button.onclick = function (e) {
+        togglePasswordVisibility(button.getAttribute("data-toggle-password"), button, e);
+      };
     });
   }
 
@@ -380,13 +403,33 @@
   }
 
   async function handleLogin(event) {
-    event.preventDefault();
+    if (event) {
+      if (typeof event.preventDefault === "function") event.preventDefault();
+      if (typeof event.stopPropagation === "function") event.stopPropagation();
+    }
+    refreshElements();
     if (submitting) return;
-    const email = els.loginEmail ? els.loginEmail.value : "";
+
+    const email = els.loginEmail ? els.loginEmail.value.trim() : "";
     const password = els.loginPassword ? els.loginPassword.value : "";
     showNotice("");
+
+    if (!email) {
+      showNotice("Please enter your registered email address.", "error");
+      if (els.loginEmail) els.loginEmail.focus();
+      return;
+    }
+    if (!password) {
+      showNotice("Please enter your password.", "error");
+      if (els.loginPassword) els.loginPassword.focus();
+      return;
+    }
+
     setSubmitting(true, els.loginSubmit, "Logging in…");
     try {
+      if (!window.authService) {
+        throw new Error("Authentication service is initializing. Please wait a moment and try again.");
+      }
       const user = await window.authService.login(email, password);
       setFlash("Welcome back, " + (user ? user.fullName : "friend") + "!", "success");
       const target = safeRedirectTarget(user);
@@ -654,6 +697,156 @@
     });
   }
 
+  
+  // Fail-safe global document click delegation for all authentication actions
+  function handleDocumentClick(e) {
+    // 1. Password reveal toggles (Show / Hide)
+    const toggleBtn = e.target.closest("[data-toggle-password]");
+    if (toggleBtn) {
+      if (e._pwToggled) return;
+      togglePasswordVisibility(toggleBtn.getAttribute("data-toggle-password"), toggleBtn, e);
+      return;
+    }
+
+    // 2. Auth mode switcher: Section A (login) and Section B (signup)
+    const modeBtn = e.target.closest("#auth-mode-login, #auth-mode-signup, [data-auth-mode]");
+    if (modeBtn) {
+      e.preventDefault();
+      const mode = modeBtn.getAttribute("data-auth-mode") || (modeBtn.id === "auth-mode-signup" ? "signup" : "login");
+      setMode(mode, e);
+      return;
+    }
+
+    // 3. Trip owner admin setup button
+    const ownerBtn = e.target.closest("#trigger-owner-admin-btn, .trigger-owner-setup-link, #trigger-admin-setup-btn");
+    if (ownerBtn) {
+      e.preventDefault();
+      setMode("admin-setup", e);
+      return;
+    }
+
+    // 4. Back to login / Cancel buttons
+    const backBtn = e.target.closest("#back-to-login, #admin-setup-back, #reset-back-to-login");
+    if (backBtn) {
+      e.preventDefault();
+      setMode("login", e);
+      return;
+    }
+
+    // 5. Forgot password link
+    const forgotLink = e.target.closest("#forgot-password-link");
+    if (forgotLink) {
+      e.preventDefault();
+      setMode("forgot", e);
+      return;
+    }
+
+    // 6. Verify invitation code button
+    const verifyInviteBtn = e.target.closest("#validate-invite-btn");
+    if (verifyInviteBtn) {
+      e.preventDefault();
+      validateInvite();
+      return;
+    }
+
+    // 7. Regenerate admin invitation code
+    const regenBtn = e.target.closest("#admin-regenerate-code-btn");
+    if (regenBtn) {
+      e.preventDefault();
+      if (els.adminFirstInviteCode && window.chroniclesUtils && window.chroniclesUtils.randomInviteCode) {
+        els.adminFirstInviteCode.value = window.chroniclesUtils.randomInviteCode("Member");
+      }
+      return;
+    }
+
+    // 8. Admin established login button
+    const establishedLoginBtn = e.target.closest("#admin-established-login-btn");
+    if (establishedLoginBtn) {
+      e.preventDefault();
+      if (window.authService && window.authService.isAdmin()) {
+        window.location.replace("admin.html");
+        return;
+      }
+      setMode("login", e);
+      if (els.loginEmail) els.loginEmail.value = "harshitvaidya28@gmail.com";
+      if (els.loginPassword) els.loginPassword.focus();
+      showNotice("Enter your Admin password to access the Control Panel.", "info");
+      return;
+    }
+
+    // 9. Admin success copy button
+    const copyBtn = e.target.closest("#admin-success-copy-btn");
+    if (copyBtn) {
+      e.preventDefault();
+      const code = els.adminSuccessCode ? els.adminSuccessCode.textContent.trim() : "";
+      if (!code) return;
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        navigator.clipboard.writeText(code).then(function () {
+          if (els.adminSuccessCopyText) els.adminSuccessCopyText.textContent = "Copied!";
+          if (window.showToast) window.showToast("Invitation code copied: " + code, "success");
+          setTimeout(function () {
+            if (els.adminSuccessCopyText) els.adminSuccessCopyText.textContent = "Copy Code";
+          }, 2500);
+        }).catch(function () {
+          showNotice("Code: " + code, "info");
+        });
+      } else {
+        showNotice("Code: " + code, "info");
+      }
+      return;
+    }
+
+    // 10. Admin success redirect button
+    const redirectBtn = e.target.closest("#admin-success-redirect-btn");
+    if (redirectBtn) {
+      e.preventDefault();
+      window.location.replace("admin.html");
+      return;
+    }
+
+    // 11. Login submit button
+    const loginSubmitBtn = e.target.closest("#login-submit");
+    if (loginSubmitBtn) {
+      e.preventDefault();
+      handleLogin(e);
+      return;
+    }
+
+    // 12. Signup submit button
+    const signupSubmitBtn = e.target.closest("#signup-submit");
+    if (signupSubmitBtn) {
+      e.preventDefault();
+      handleSignup(e);
+      return;
+    }
+
+    // 13. Admin setup submit button
+    const adminSubmitBtn = e.target.closest("#admin-setup-submit");
+    if (adminSubmitBtn) {
+      e.preventDefault();
+      handleAdminSetupSubmit(e);
+      return;
+    }
+
+    // 14. Forgot password submit button
+    const forgotSubmitBtn = e.target.closest("#forgot-submit");
+    if (forgotSubmitBtn) {
+      e.preventDefault();
+      handleForgot(e);
+      return;
+    }
+
+    // 15. Reset password submit button
+    const resetSubmitBtn = e.target.closest("#reset-submit");
+    if (resetSubmitBtn) {
+      e.preventDefault();
+      handleResetPasswordSubmit(e);
+      return;
+    }
+  }
+
+  document.addEventListener("click", handleDocumentClick);
+
   function wireEvents() {
     refreshElements();
     if (els.modeLogin) {
@@ -770,7 +963,7 @@
       }
 
       if (window.authService) {
-        await window.authService.ready;
+        await Promise.race([window.authService.ready, new Promise(function (resolve) { setTimeout(resolve, 3500); })]);
         updateModeBadge();
         await checkAdminStatus();
         if (els.localAdminSetup) {
