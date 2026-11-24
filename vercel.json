@@ -1,22 +1,12 @@
 {
   "version": 2,
-  "cleanUrls": true,
+  "cleanUrls": false,
   "trailingSlash": false,
-  "rewrites": [
-    { "source": "/auth", "destination": "/auth.html" },
-    { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/expenses", "destination": "/expenses.html" },
-    { "source": "/explore", "destination": "/explore.html" },
-    { "source": "/hall-of-fame", "destination": "/hall-of-fame.html" },
-    { "source": "/memories", "destination": "/memories.html" },
-    { "source": "/planner", "destination": "/planner.html" },
-    { "source": "/schedule", "destination": "/schedule.html" },
-    { "source": "/squad", "destination": "/squad.html" },
-    { "source": "/public/(.*)", "destination": "/public/$1" },
-    { "source": "/images/(.*)", "destination": "/public/images/$1" },
-    { "source": "/icons/(.*)", "destination": "/public/icons/$1" },
-    { "source": "/videos/(.*)", "destination": "/public/videos/$1" }
-  ],
+  "functions": {
+    "server.js": {
+      "includeFiles": "*.html"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
