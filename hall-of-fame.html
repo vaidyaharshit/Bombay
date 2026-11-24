@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hall of Fame — The 12 Chronicles</title>
   <meta name="description" content="Collaborative travel photography gallery and digital scrapbook for 12 friends exploring Mumbai & IIT Bombay Techfest 2026." />
+  <link rel="icon" type="image/svg+xml" href="public/icons/icon.svg" />
+  <link rel="manifest" href="manifest.json" />
   
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -131,8 +133,8 @@
 
       <form id="gallery-upload-form" class="space-y-4 text-xs">
         <div>
-          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Choose Photo(s) *</label>
-          <input type="file" id="photo-file-input" accept="image/*" required 
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Choose Photo(s) (Multi-Select Supported) *</label>
+          <input type="file" id="photo-file-input" accept="image/*" multiple required 
                  class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#354B3A]/10 file:text-[#354B3A] hover:file:bg-[#354B3A]/20 cursor-pointer" />
           <div id="upload-preview" class="flex gap-2 overflow-x-auto mt-2"></div>
         </div>
@@ -140,7 +142,7 @@
         <!-- Upload Progress Indicator -->
         <div id="upload-progress-wrap" class="hidden space-y-1">
           <div class="flex justify-between text-[11px] font-semibold text-[#354B3A]">
-            <span>Uploading to Firebase Cloud Storage...</span>
+            <span>Uploading to Supabase Storage...</span>
             <span id="upload-percent-text">100%</span>
           </div>
           <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
@@ -253,17 +255,19 @@
   <footer class="mt-20 border-t border-[#A4A88A]/30 bg-white/60">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between text-xs text-[#282824]/70">
       <span>The 12 Chronicles • Mumbai 2026</span>
-      <button onclick="window.openFirebaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
-        🔥 Firebase Status: Sync Ready
+      <button onclick="window.openSupabaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
+        ⚡ Supabase Status: Sync Ready
       </button>
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="js/firebase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/firebase.js"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/main.js"></script>
   <script src="js/gallery.js"></script>
 </body>
 </html>
+

@@ -359,35 +359,47 @@
           uploadProgressBar.style.width = `${Math.min(progress, 90)}%`;
         }, 100);
 
-        // Process files
-        const file = files[0];
-        const reader = new FileReader();
-        reader.onload = async (re) => {
-          clearInterval(progressInterval);
-          uploadProgressBar.style.width = '100%';
+        // Process all selected files
+        const fileList = Array.from(files);
+        let completedCount = 0;
 
-          setTimeout(async () => {
-            await window.chroniclesData.addPhoto({
-              title,
-              caption,
-              day,
-              album,
-              uploaderId: member ? member.id : 'mem_1',
-              uploaderName: member ? member.name : 'Squad Member',
-              url: re.target.result // Base64 dataURL (or Firebase storage URL if connected)
-            });
+        for (let i = 0; i < fileList.length; i++) {
+          const file = fileList[i];
+          await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = async (re) => {
+              const photoTitle = fileList.length > 1 ? `${title} (${i + 1})` : title;
+              await window.chroniclesData.addPhoto({
+                title: photoTitle,
+                caption,
+                day,
+                album,
+                uploaderId: member ? member.id : 'mem_1',
+                uploaderName: member ? member.name : 'Squad Member',
+                url: re.target.result
+              });
+              completedCount++;
+              const percent = Math.round((completedCount / fileList.length) * 100);
+              uploadProgressBar.style.width = `${percent}%`;
+              resolve();
+            };
+            reader.readAsDataURL(file);
+          });
+        }
 
-            uploadProgressWrap.classList.add('hidden');
-            uploadProgressBar.style.width = '0%';
-            uploadModal.classList.add('hidden');
-            uploadForm.reset();
-            previewContainer.innerHTML = '';
+        clearInterval(progressInterval);
+        uploadProgressBar.style.width = '100%';
 
-            window.showToast('Photo uploaded to Hall of Fame!', 'success');
-            loadPhotos();
-          }, 300);
-        };
-        reader.readAsDataURL(file);
+        setTimeout(() => {
+          uploadProgressWrap.classList.add('hidden');
+          uploadProgressBar.style.width = '0%';
+          uploadModal.classList.add('hidden');
+          uploadForm.reset();
+          previewContainer.innerHTML = '';
+
+          window.showToast(`${fileList.length} photo(s) uploaded to Hall of Fame!`, 'success');
+          loadPhotos();
+        }, 300);
       });
     }
   }
@@ -431,7 +443,10 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (window.authService) {
+      await window.authService.ready;
+    }
     initFilterSelects();
     initUploader();
     initLightbox();
@@ -440,5 +455,11 @@
     window.addEventListener('chronicles:photosUpdated', () => {
       loadPhotos();
     });
+
+    window.addEventListener('chronicles:membersChanged', () => {
+      initFilterSelects();
+      loadPhotos();
+    });
   });
 })();
+

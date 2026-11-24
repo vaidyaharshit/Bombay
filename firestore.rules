@@ -1,0 +1,143 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------------
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userExists() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function profile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isActive() {
+      return userExists() && profile().accountStatus == 'active';
+    }
+
+    function roleStatus() {
+      return isActive() ? profile().roleStatus : '';
+    }
+
+    function isApprovedMember() {
+      return isActive() && (roleStatus() == 'approved' || roleStatus() == 'pending');
+    }
+
+    // Admin is a server-provisioned custom claim, never an email or a
+    // client-writable profile field.
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
+
+    function isTreasurer() {
+      return isActive() && profile().role == 'Treasurer' && roleStatus() == 'approved';
+    }
+
+    function canManageExpenses() {
+      return isAdmin() || isTreasurer();
+    }
+
+    // ---------------------------------------------------------------------
+    // Member profiles and roles
+    // ---------------------------------------------------------------------
+    match /users/{userId} {
+      allow read: if isAdmin() || isApprovedMember() || (signedIn() && request.auth.uid == userId);
+
+      // Profiles are created only by the redeemInvite Cloud Function. Clients
+      // can never assign their own role, status, or Admin access.
+      allow create: if false;
+
+      // Members may edit only their own presentation fields. Admin role and
+      // account status changes are performed by trusted Cloud Functions.
+      allow update: if isAdmin()
+        || (
+          signedIn()
+          && request.auth.uid == userId
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'fullName', 'nickname', 'tripRole', 'funFact', 'photoURL', 'updatedAt'
+          ])
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.roleStatus == resource.data.roleStatus
+          && request.resource.data.accountStatus == resource.data.accountStatus
+          && request.resource.data.email == resource.data.email
+          && request.resource.data.uid == resource.data.uid
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------------
+    // Shared expense ledger — members read, Treasurer/Admin write
+    // ---------------------------------------------------------------------
+    match /expenses/{expenseId} {
+      allow read: if isApprovedMember();
+
+      allow create: if canManageExpenses()
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.amount is number
+        && request.resource.data.amount > 0
+        && request.resource.data.paidById is string
+        && request.resource.data.splitBetween is list
+        && request.resource.data.splitBetween.size() > 0
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.paymentStatus in ['pending', 'paid', 'settled'];
+
+      allow update: if canManageExpenses()
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.paymentStatus in ['pending', 'paid', 'settled'];
+
+      allow delete: if canManageExpenses();
+    }
+
+    // ---------------------------------------------------------------------
+    // Expense categories and other small settings documents
+    // ---------------------------------------------------------------------
+    match /settings/{settingId} {
+      allow read: if isApprovedMember();
+      allow write: if canManageExpenses();
+    }
+
+    // ---------------------------------------------------------------------
+    // Invitation codes. Reads are Admin-only; validation and redemption happen
+    // through Cloud Functions so usage limits stay atomic. No client writes.
+    // ---------------------------------------------------------------------
+    match /groupInvites/{code} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // ---------------------------------------------------------------------
+    // Explore destinations
+    // ---------------------------------------------------------------------
+    match /exploreDestinations/{placeId} {
+      allow read: if isApprovedMember();
+
+      allow create: if isApprovedMember()
+        && request.resource.data.placeId == placeId
+        && request.resource.data.name is string
+        && request.resource.data.addedAt is string
+        && request.resource.data.status in ['Yet to Visit', 'Visited'];
+
+      allow update: if isApprovedMember()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status', 'visited', 'updatedAt', 'notes', 'rating'
+        ])
+        && request.resource.data.status in ['Yet to Visit', 'Visited'];
+
+      allow delete: if isAdmin() || resource.data.addedById == request.auth.uid;
+    }
+
+    // Deny everything not explicitly matched above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Member Access — The 12 Chronicles</title>
+  <meta name="description" content="Private member login and registration for The 12 Chronicles — IIT Bombay Techfest × Mumbai 2026." />
+  <link rel="icon" type="image/svg+xml" href="public/icons/icon.svg" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#F7F4EC',
+            forest: { DEFAULT: '#354B3A', dark: '#243428', light: '#46624D' },
+            terracotta: { DEFAULT: '#C76B4A', dark: '#AB5636', light: '#D88467' },
+            olive: { DEFAULT: '#A4A88A', dark: '#8A8E71', light: '#C2C5AD' },
+            charcoal: { DEFAULT: '#282824', light: '#40403B', muted: '#6B6B63' }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="bg-[#F7F4EC] text-[#282824] paper-texture min-h-screen flex flex-col">
+
+  <header class="border-b border-[#A4A88A]/30 bg-white/60 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-full bg-[#354B3A] text-white flex items-center justify-center font-serif text-lg font-bold group-hover:bg-[#C76B4A] transition-colors shadow-sm">
+          12
+        </div>
+        <div>
+          <span class="font-serif font-bold text-xl sm:text-2xl text-[#282824] tracking-tight group-hover:text-[#354B3A] transition-colors">
+            The 12 Chronicles
+          </span>
+          <span class="hidden md:block text-[11px] uppercase tracking-widest text-[#A4A88A] font-semibold">
+            IIT Bombay Techfest × Mumbai 2026
+          </span>
+        </div>
+      </a>
+      <a href="index.html" class="text-xs font-semibold text-[#354B3A] hover:underline">Back to home</a>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+
+      <section class="hidden lg:block">
+        <span class="text-xs font-bold uppercase tracking-widest text-[#C76B4A]">Private Member Access</span>
+        <h1 class="font-serif text-5xl font-bold text-[#282824] mt-3 leading-tight">
+          Twelve friends.<br />One shared journal.
+        </h1>
+        <p class="text-sm text-[#282824]/70 mt-5 max-w-md leading-relaxed">
+          Sign in to unlock the master schedule, live expense ledger, squad directory, planner and the Hall of Fame.
+          Registration is restricted to members with an Admin-issued invitation. There is no public Admin signup.
+        </p>
+
+        <div class="mt-8 space-y-4 max-w-md">
+          <div class="flex items-start gap-3 p-4 bg-white rounded-xl border border-[#A4A88A]/30">
+            <span class="text-lg">🔐</span>
+            <div>
+              <p class="text-sm font-bold text-[#282824]">Real accounts, real roles</p>
+              <p class="text-xs text-[#282824]/65 mt-0.5">One Admin issues every invitation and approves Treasurer access.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-white rounded-xl border border-[#A4A88A]/30">
+            <span class="text-lg">🧾</span>
+            <div>
+              <p class="text-sm font-bold text-[#282824]">Treasurer-controlled ledger</p>
+              <p class="text-xs text-[#282824]/65 mt-0.5">Only approved Treasurers and Admins can edit shared expenses.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-white rounded-xl border border-[#A4A88A]/30">
+            <span class="text-lg">👥</span>
+            <div>
+              <p class="text-sm font-bold text-[#282824]">Live squad directory</p>
+              <p class="text-xs text-[#282824]/65 mt-0.5">Every registered member appears instantly across the site.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="w-full max-w-md mx-auto lg:mx-0">
+        <div class="journal-card p-6 sm:p-8 bg-white">
+          <div class="flex items-center justify-between gap-3 mb-5">
+            <div>
+              <h2 id="auth-heading" class="font-serif text-2xl font-bold text-[#282824]">Welcome back</h2>
+              <p id="auth-subheading" class="text-xs text-[#282824]/60 mt-0.5">Log in with your member account.</p>
+            </div>
+            <span id="auth-mode-badge" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#354B3A]/10 text-[#354B3A]">
+              ⚡ Supabase Live
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-1 p-1 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/30 mb-5">
+            <button type="button" id="auth-mode-login" data-auth-mode="login"
+              class="py-2.5 rounded-lg text-xs font-bold transition-colors bg-white text-[#354B3A] shadow-sm">Section A: Log In</button>
+            <button type="button" id="auth-mode-signup" data-auth-mode="signup"
+              class="py-2.5 rounded-lg text-xs font-bold transition-colors text-[#282824]/60 hover:text-[#354B3A]">Section B: Invitation Code</button>
+          </div>
+
+          <div id="auth-notice" class="hidden mb-4 p-3 rounded-xl border text-xs leading-relaxed"></div>
+
+          <form id="login-form" class="space-y-4 text-xs" novalidate>
+            <div>
+              <label for="login-email" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Email Address</label>
+              <input id="login-email" type="email" autocomplete="email" required placeholder="you@example.com"
+                class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+            </div>
+            <div>
+              <label for="login-password" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Password</label>
+              <div class="relative">
+                <input id="login-password" type="password" autocomplete="current-password" required placeholder="Your password"
+                  class="w-full px-3.5 py-2.5 pr-16 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+                <button type="button" data-toggle-password="login-password"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#354B3A] hover:bg-[#354B3A]/10 rounded">Show</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <button type="button" id="forgot-password-link" class="text-[11px] font-semibold text-[#354B3A] hover:underline">
+                Forgot password?
+              </button>
+              <span class="text-[11px] text-[#A4A88A]">Private group only</span>
+            </div>
+            <button type="submit" id="login-submit"
+              class="w-full py-3 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+              Log In to Chronicles
+            </button>
+          </form>
+
+          <form id="signup-form" class="hidden space-y-4 text-xs" novalidate>
+            <div id="signup-invite-step" class="p-4 rounded-xl bg-[#F7F4EC] border border-[#A4A88A]/30 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-[#354B3A] text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                <div>
+                  <p class="text-xs font-bold text-[#282824]">Step 1: Verify Group Invitation Code</p>
+                  <p class="text-[10px] text-[#282824]/60 mt-0.5">Every squad member must be invited by the Admin. Your role is determined automatically by the code.</p>
+                </div>
+              </div>
+              <div>
+                <label for="signup-invite" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Invitation Code *</label>
+                <div class="flex gap-2">
+                  <input id="signup-invite" type="text" autocomplete="off" required placeholder="e.g. CHRONICLES-M8X92K"
+                    class="flex-1 px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm uppercase tracking-wider focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+                  <button type="button" id="validate-invite-btn"
+                    class="px-4 py-2.5 rounded-lg bg-[#354B3A] hover:bg-[#243428] text-white text-xs font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-1.5 whitespace-nowrap">
+                    <span>Verify Invitation Code</span>
+                  </button>
+                </div>
+              </div>
+              <div id="signup-invite-status" class="hidden p-3 rounded-lg border text-[11px] leading-relaxed"></div>
+              <p class="text-[10px] text-[#A4A88A]">No code? Ask Harshit (Admin) to generate an invitation code for you.</p>
+            </div>
+
+            <div id="signup-details" class="hidden space-y-4">
+              <div class="flex items-center gap-2 pt-2 border-t border-[#A4A88A]/20">
+                <span class="w-6 h-6 rounded-full bg-[#354B3A] text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                <div>
+                  <p class="text-xs font-bold text-[#282824]">Step 2: Complete Squad Registration</p>
+                  <p class="text-[10px] text-[#282824]/60 mt-0.5">Your invitation code is verified. Set your account credentials.</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-4">
+                <img id="signup-photo-preview" alt="Profile photo preview"
+                  class="w-16 h-16 rounded-full object-cover border border-[#A4A88A]/40 bg-[#F7F4EC]" />
+                <div class="flex-1">
+                  <label for="signup-photo" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Profile Photo (optional)</label>
+                  <input id="signup-photo" type="file" accept="image/*"
+                    class="block w-full text-[11px] text-[#282824]/70 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-[#354B3A] file:text-white file:text-[11px] file:font-semibold hover:file:bg-[#243428]" />
+                  <p class="text-[10px] text-[#A4A88A] mt-1">Auto-compressed. JPG or PNG, under 8 MB.</p>
+                </div>
+              </div>
+
+              <div>
+                <label for="signup-fullname" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Full Name</label>
+                <input id="signup-fullname" type="text" autocomplete="name" required placeholder="e.g. Aryan Sharma"
+                  class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+              </div>
+
+              <div>
+                <label for="signup-email" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Email Address</label>
+                <input id="signup-email" type="email" autocomplete="email" required placeholder="you@example.com"
+                  class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="signup-password" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Password</label>
+                  <div class="relative">
+                    <input id="signup-password" type="password" autocomplete="new-password" required placeholder="Min 6 characters"
+                      class="w-full px-3.5 py-2.5 pr-14 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+                    <button type="button" data-toggle-password="signup-password"
+                      class="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#354B3A] hover:bg-[#354B3A]/10 rounded">Show</button>
+                  </div>
+                </div>
+                <div>
+                  <label for="signup-confirm" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Confirm</label>
+                  <input id="signup-confirm" type="password" autocomplete="new-password" required placeholder="Repeat password"
+                    class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+                </div>
+              </div>
+
+              <input id="signup-role" type="hidden" value="Member" />
+              <div id="signup-role-display" class="p-3 bg-[#354B3A]/5 rounded-xl border border-[#354B3A]/20 text-[11px] text-[#282824]/75 leading-relaxed">
+                Role issued by invitation.
+              </div>
+              <div id="signup-role-note" class="p-3 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/30 text-[11px] text-[#282824]/70 leading-relaxed">
+                Your invitation determines your role. Treasurer invitations are reviewed by the Admin after registration.
+              </div>
+
+              <button type="submit" id="signup-submit"
+                class="w-full py-3 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm">
+                Complete Registration &amp; Join Squad
+              </button>
+            </div>
+          </form>
+
+          <form id="forgot-form" class="hidden space-y-4 text-xs" novalidate>
+            <p class="text-xs text-[#282824]/70 leading-relaxed">
+              Enter your account email and we will send a secure password reset link.
+            </p>
+            <div>
+              <label for="forgot-email" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Email Address</label>
+              <input id="forgot-email" type="email" autocomplete="email" required placeholder="you@example.com"
+                class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+            </div>
+            <button type="submit" id="forgot-submit"
+              class="w-full py-3 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+              Send Reset Link
+            </button>
+            <button type="button" id="back-to-login"
+              class="w-full py-2.5 rounded-xl border border-[#A4A88A]/40 text-xs font-semibold text-[#282824] hover:bg-[#F7F4EC]">
+              Back to Log In
+            </button>
+          </form>
+
+          <!-- Password Reset (Update Password) Form -->
+          <form id="reset-password-form" class="hidden space-y-4 text-xs" novalidate>
+            <div class="p-3.5 bg-[#354B3A]/10 rounded-xl border border-[#354B3A]/30 text-xs text-[#282824] leading-relaxed">
+              <div class="flex items-center gap-2 font-bold text-[#354B3A] mb-1">
+                <span class="text-base">🔑</span>
+                <span>Set New Password</span>
+              </div>
+              <p class="text-[11px] text-[#282824]/80">
+                Enter your new secure password below to regain access to your Chronicles account.
+              </p>
+            </div>
+
+            <div>
+              <label for="reset-password" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">New Password</label>
+              <div class="relative">
+                <input id="reset-password" type="password" autocomplete="new-password" required placeholder="Min 6 characters"
+                  class="w-full px-3.5 py-2.5 pr-14 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+                <button type="button" data-toggle-password="reset-password"
+                  class="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#354B3A] hover:bg-[#354B3A]/10 rounded">Show</button>
+              </div>
+            </div>
+
+            <div>
+              <label for="reset-confirm" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Confirm New Password</label>
+              <input id="reset-confirm" type="password" autocomplete="new-password" required placeholder="Repeat new password"
+                class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+            </div>
+
+            <button type="submit" id="reset-submit"
+              class="w-full py-3 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-md">
+              Update Password &amp; Open Dashboard
+            </button>
+            <button type="button" id="reset-back-to-login"
+              class="w-full py-2.5 rounded-xl border border-[#A4A88A]/40 text-xs font-semibold text-[#282824] hover:bg-[#F7F4EC]">
+              Cancel &amp; Return to Log In
+            </button>
+          </form>
+
+          <!-- Dedicated Trip Owner / Admin Setup Form -->
+          <form id="admin-setup-form" class="hidden space-y-4 text-xs" novalidate>
+            <div class="p-3.5 bg-[#C76B4A]/10 rounded-xl border border-[#C76B4A]/30 text-xs text-[#282824] leading-relaxed">
+              <div class="flex items-center gap-2 font-bold text-[#C76B4A] mb-1">
+                <span class="text-base">👑</span>
+                <span>Trip Owner / Admin Setup</span>
+              </div>
+              <p class="text-[11px] text-[#282824]/80">
+                You are setting up the sole Administrator and Owner account for <strong>The 12 Chronicles</strong>. This one-time setup is strictly restricted to your authorized email.
+              </p>
+            </div>
+
+            <div>
+              <label for="admin-fullname" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Full Name</label>
+              <input id="admin-fullname" type="text" autocomplete="name" required value="Harshit Vaidya (Admin)"
+                class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+            </div>
+
+            <div>
+              <label for="admin-email" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Admin Email (Authorized Owner)</label>
+              <input id="admin-email" type="email" readonly value="harshitvaidya28@gmail.com"
+                class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm bg-gray-50 text-gray-700 cursor-not-allowed font-medium" />
+              <span class="text-[10px] text-[#A4A88A] mt-1 block">Predefined authorized account. Only this email can bootstrap Admin privileges.</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label for="admin-password" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Admin Password</label>
+                <div class="relative">
+                  <input id="admin-password" type="password" autocomplete="new-password" required placeholder="Min 6 characters"
+                    class="w-full px-3.5 py-2.5 pr-14 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+                  <button type="button" data-toggle-password="admin-password"
+                    class="absolute right-1.5 top-1/2 -translate-y-1/2 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#354B3A] hover:bg-[#354B3A]/10 rounded">Show</button>
+                </div>
+              </div>
+              <div>
+                <label for="admin-confirm" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Confirm Password</label>
+                <input id="admin-confirm" type="password" autocomplete="new-password" required placeholder="Repeat password"
+                    class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A] focus:ring-2 focus:ring-[#354B3A]/10" />
+              </div>
+            </div>
+
+            <!-- First Group Invitation Code Configuration -->
+            <div class="p-4 rounded-xl bg-[#F7F4EC] border border-[#A4A88A]/30 space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-[#354B3A]">Squad Access Key</span>
+                  <h3 class="font-serif text-sm font-bold text-[#282824]">Generate First Invitation Code</h3>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#354B3A] text-white">For Squad Members</span>
+              </div>
+              <p class="text-[11px] text-[#282824]/70">
+                Configure your squad's first invitation code now. Your friends will use this code to register.
+              </p>
+
+              <div>
+                <label for="admin-first-invite-code" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">
+                  Invitation Code *
+                </label>
+                <div class="flex gap-2">
+                  <input id="admin-first-invite-code" type="text" autocomplete="off" required
+                    class="flex-1 px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm font-mono font-bold uppercase tracking-wider bg-white focus:outline-none focus:border-[#354B3A]" />
+                  <button type="button" id="admin-regenerate-code-btn"
+                    class="px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-[#282824] bg-white text-xs font-semibold hover:bg-[#F7F4EC] flex items-center gap-1">
+                    <span>↻ Regenerate</span>
+                  </button>
+                </div>
+                <p class="text-[10px] text-[#A4A88A] mt-1">Unique squad code format (e.g. CHRONICLES-M8X92K)</p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="admin-first-invite-uses" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">
+                    Max Uses
+                  </label>
+                  <input id="admin-first-invite-uses" type="number" min="1" max="50" value="12"
+                    class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm bg-white focus:outline-none focus:border-[#354B3A]" />
+                  <p class="text-[10px] text-[#A4A88A] mt-0.5">Default 12 for squad</p>
+                </div>
+                <div>
+                  <label for="admin-first-invite-expires" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">
+                    Expiry Date (Optional)
+                  </label>
+                  <input id="admin-first-invite-expires" type="date"
+                    class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm bg-white focus:outline-none focus:border-[#354B3A]" />
+                  <p class="text-[10px] text-[#A4A88A] mt-0.5">Leave empty for none</p>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" id="admin-setup-submit"
+              class="w-full py-3 rounded-xl bg-[#C76B4A] hover:bg-[#aa5537] text-white text-sm font-semibold transition-colors shadow-md flex items-center justify-center gap-2">
+              <span>Create Admin Account &amp; Generate Invitation Code</span>
+            </button>
+            <button type="button" id="admin-setup-back"
+              class="w-full py-2.5 rounded-xl border border-[#A4A88A]/40 text-xs font-semibold text-[#282824] hover:bg-[#F7F4EC]">
+              Cancel & Return to Member Log In
+            </button>
+          </form>
+
+          <!-- First-Time Admin Setup Success Card -->
+          <div id="admin-setup-success" class="hidden space-y-4 text-xs">
+            <div class="p-5 rounded-2xl bg-[#354B3A]/10 border border-[#354B3A]/30 text-center space-y-3">
+              <div class="w-12 h-12 rounded-full bg-[#354B3A] text-white flex items-center justify-center mx-auto text-xl shadow-sm">
+                ✓
+              </div>
+              <div>
+                <h3 class="font-serif text-lg font-bold text-[#282824]">Admin Account Initialized!</h3>
+                <p class="text-xs text-[#282824]/75 mt-0.5">
+                  Your Admin privileges are secured. Here is the first invitation code generated for your squad:
+                </p>
+              </div>
+
+              <div class="p-4 bg-white rounded-xl border border-[#A4A88A]/40 shadow-xs space-y-2.5 text-left">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] uppercase font-bold tracking-wider text-[#A4A88A]">First Group Invitation Code</span>
+                  <span id="admin-success-role-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#354B3A] text-white">Member</span>
+                </div>
+                <div class="flex items-center justify-between gap-2 p-2 rounded-lg bg-[#F7F4EC] border border-[#A4A88A]/20">
+                  <code id="admin-success-code" class="text-base sm:text-lg font-mono font-bold text-[#354B3A] tracking-wider select-all">CHRONICLES-M...</code>
+                  <button type="button" id="admin-success-copy-btn"
+                    class="px-3 py-1.5 rounded-lg bg-[#354B3A] hover:bg-[#243428] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    <span id="admin-success-copy-text">Copy Code</span>
+                  </button>
+                </div>
+                <p id="admin-success-details" class="text-[10px] text-[#A4A88A] pt-1">
+                  Up to 12 uses • Share with your group members
+                </p>
+              </div>
+
+              <button type="button" id="admin-success-redirect-btn"
+                class="w-full py-3 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold transition-colors shadow-md">
+                Open Admin Control Panel →
+              </button>
+            </div>
+          </div>
+
+          <!-- Discreet Trip Owner / Admin Setup Option (Visible from both Log In and Create Account) -->
+          <div id="owner-setup-wrapper" class="mt-6 pt-4 border-t border-[#A4A88A]/25 text-center">
+            <button type="button" id="trigger-owner-admin-btn"
+              class="inline-flex items-center gap-2 text-xs font-semibold text-[#C76B4A] hover:text-[#9e4a2d] transition-all py-1.5 px-3.5 rounded-xl hover:bg-[#C76B4A]/10 border border-[#C76B4A]/25 shadow-xs">
+              <span class="text-sm">👑</span>
+              <span>Trip Owner? Set Up Admin Account</span>
+            </button>
+            <p id="owner-setup-status-msg" class="text-[11px] text-[#282824]/60 mt-1.5">
+              One-time secure initialization for harshitvaidya28@gmail.com
+            </p>
+          </div>
+
+          <p class="text-[10px] text-[#A4A88A] mt-5 text-center leading-relaxed">
+            By continuing you confirm you are one of the 12 invited members of this private trip journal.
+          </p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="border-t border-[#A4A88A]/30 bg-white/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#A4A88A]">
+      <span>© 2026 The 12 Chronicles. Private travel journal.</span>
+      <div class="flex items-center gap-4">
+        <button onclick="window.openSupabaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline">
+          ⚡ Supabase Connection Settings
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/auth-ui.js"></script>
+</body>
+
+</html>

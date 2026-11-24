@@ -1,0 +1,19 @@
+{
+  "name": "the-12-chronicles",
+  "version": "1.0.0",
+  "description": "> *\"12 Friends. One Journey. A Thousand Memories.\"*",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "verify": "node scripts/verify-supabase.js",
+    "set-admin": "node scripts/set-admin.js"
+  },
+  "keywords": [
+    "supabase",
+    "travel-journal",
+    "mumbai-2026"
+  ],
+  "author": "Harshit Vaidya",
+  "license": "ISC",
+  "type": "commonjs"
+}

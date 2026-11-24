@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Control Panel — The 12 Chronicles</title>
+  <meta name="description" content="Private group administration, invitation generator, role management, and treasurer approvals for The 12 Chronicles." />
+  <link rel="icon" type="image/svg+xml" href="public/icons/icon.svg" />
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#F7F4EC',
+            forest: { DEFAULT: '#354B3A', dark: '#243428', light: '#46624D' },
+            terracotta: { DEFAULT: '#C76B4A', dark: '#AB5636', light: '#D88467' },
+            olive: { DEFAULT: '#A4A88A', dark: '#8A8E71', light: '#C2C5AD' },
+            charcoal: { DEFAULT: '#282824', light: '#40403B', muted: '#6B6B63' }
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-[#F7F4EC] text-[#282824] paper-texture flex flex-col min-h-screen">
+
+  <!-- Shared Global Navigation -->
+  <div id="global-nav"></div>
+
+  <!-- Non-Admin Fallback / Access Denied Overlay (hidden by default) -->
+  <div id="admin-access-denied" class="hidden max-w-xl mx-auto px-4 py-20 text-center">
+    <div class="bg-white rounded-2xl p-8 border border-[#C76B4A]/30 shadow-xl space-y-4">
+      <div class="w-14 h-14 mx-auto rounded-full bg-[#C76B4A]/10 text-[#C76B4A] flex items-center justify-center">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+      </div>
+      <h2 class="font-serif text-2xl font-bold text-[#282824]">Admin Access Required</h2>
+      <p class="text-xs sm:text-sm text-[#282824]/70 leading-relaxed">
+        This control panel is restricted exclusively to the Group Owner &amp; Admin. Your account does not currently have administrative privileges.
+      </p>
+      <div class="pt-2">
+        <a href="index.html" class="inline-block px-5 py-2.5 rounded-xl bg-[#354B3A] text-white text-xs font-bold hover:bg-[#243428] transition-colors shadow-sm">
+          Return to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Admin Interface -->
+  <div id="admin-main-interface" class="flex-1 flex flex-col">
+    <!-- Header Banner -->
+    <section class="border-b border-[#A4A88A]/30 bg-white/60 py-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#C76B4A]">
+                <svg class="w-4 h-4 text-[#C76B4A]" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                Owner Administration
+              </span>
+              <span class="text-xs text-[#A4A88A]">•</span>
+              <span id="admin-mode-pill" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#354B3A]/10 text-[#354B3A]">
+                Secure Mode
+              </span>
+            </div>
+            <h1 class="font-serif text-3xl sm:text-4xl font-bold text-[#282824] mt-1">Admin Control Panel</h1>
+            <p class="text-xs sm:text-sm text-[#282824]/70 mt-1.5 max-w-2xl leading-relaxed">
+              Private command center for The 12 Chronicles. Manage invitations, review Treasurer applicants, and oversee squad membership for IIT Bombay Techfest 2026.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div id="admin-identity-card" class="hidden sm:flex items-center gap-2.5 px-3 py-1.5 bg-white rounded-xl border border-[#A4A88A]/30 text-xs shadow-sm">
+              <img id="admin-avatar" src="" alt="Admin avatar" class="w-7 h-7 rounded-full object-cover border border-[#354B3A]" />
+              <div class="leading-tight">
+                <div class="font-bold text-[#282824] flex items-center gap-1">
+                  <span id="admin-name">Admin</span>
+                  <span class="text-[9px] bg-[#C76B4A] text-white px-1.5 py-0.2 rounded font-bold uppercase">Owner</span>
+                </div>
+                <div id="admin-email" class="text-[10px] text-[#A4A88A] truncate max-w-[140px]">admin@chronicles</div>
+              </div>
+            </div>
+
+            <button id="refresh-admin-btn" class="px-3.5 py-2 rounded-xl bg-white hover:bg-[#F7F4EC] border border-[#A4A88A]/40 text-[#282824] text-xs font-bold transition-all shadow-sm flex items-center gap-1.5" title="Refresh Admin Data">
+              <svg class="w-3.5 h-3.5 text-[#354B3A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+
+      <!-- SECTION D: Group Overview Stats -->
+      <section aria-labelledby="overview-heading">
+        <h2 id="overview-heading" class="text-xs font-bold uppercase tracking-wider text-[#A4A88A] mb-3">Group Overview</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+          <!-- Stat 1: Total Registered -->
+          <div class="bg-white rounded-xl p-4 border border-[#A4A88A]/30 shadow-sm flex flex-col justify-between">
+            <div class="text-[11px] font-semibold text-[#A4A88A] uppercase tracking-wider">Registered Squad</div>
+            <div class="mt-2 flex items-baseline gap-1">
+              <span id="stat-total-members" class="font-serif text-3xl font-bold text-[#282824]">0</span>
+              <span class="text-xs text-[#A4A88A] font-semibold">/ 12</span>
+            </div>
+            <div class="mt-1 text-[11px] text-[#354B3A] font-medium" id="stat-members-sub">Capacity: 12 Friends</div>
+          </div>
+
+          <!-- Stat 2: Active Members -->
+          <div class="bg-white rounded-xl p-4 border border-[#A4A88A]/30 shadow-sm flex flex-col justify-between">
+            <div class="text-[11px] font-semibold text-[#A4A88A] uppercase tracking-wider">Active Members</div>
+            <div class="mt-2">
+              <span id="stat-active-members" class="font-serif text-3xl font-bold text-[#354B3A]">0</span>
+            </div>
+            <div class="mt-1 text-[11px] text-[#A4A88A]">Full access enabled</div>
+          </div>
+
+          <!-- Stat 3: Pending Treasurers -->
+          <div class="bg-white rounded-xl p-4 border border-[#A4A88A]/30 shadow-sm flex flex-col justify-between">
+            <div class="text-[11px] font-semibold text-[#C76B4A] uppercase tracking-wider">Pending Treasurers</div>
+            <div class="mt-2 flex items-center gap-2">
+              <span id="stat-pending-treasurers" class="font-serif text-3xl font-bold text-[#C76B4A]">0</span>
+              <span id="pending-badge" class="hidden text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#C76B4A]/15 text-[#C76B4A]">Needs Review</span>
+            </div>
+            <div class="mt-1 text-[11px] text-[#A4A88A]">Awaiting your approval</div>
+          </div>
+
+          <!-- Stat 4: Active Invites -->
+          <div class="bg-white rounded-xl p-4 border border-[#A4A88A]/30 shadow-sm flex flex-col justify-between">
+            <div class="text-[11px] font-semibold text-[#A4A88A] uppercase tracking-wider">Active Codes</div>
+            <div class="mt-2">
+              <span id="stat-active-invites" class="font-serif text-3xl font-bold text-[#282824]">0</span>
+            </div>
+            <div class="mt-1 text-[11px] text-[#354B3A]">Ready to redeem</div>
+          </div>
+
+          <!-- Stat 5: Used / Expired Invites -->
+          <div class="bg-white rounded-xl p-4 border border-[#A4A88A]/30 shadow-sm flex flex-col justify-between col-span-2 sm:col-span-1">
+            <div class="text-[11px] font-semibold text-[#A4A88A] uppercase tracking-wider">Used / Expired</div>
+            <div class="mt-2">
+              <span id="stat-used-invites" class="font-serif text-3xl font-bold text-[#6B6B63]">0</span>
+            </div>
+            <div class="mt-1 text-[11px] text-[#A4A88A]">Redeemed or lapsed</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION C: Pending Treasurer Approvals (Prominently placed when active) -->
+      <section id="treasurer-approvals-section" aria-labelledby="approvals-heading" class="bg-white rounded-2xl p-6 border border-[#A4A88A]/30 shadow-sm">
+        <div class="flex items-center justify-between pb-4 border-b border-[#A4A88A]/20">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-[#C76B4A] animate-pulse"></span>
+              <h2 id="approvals-heading" class="font-serif text-xl font-bold text-[#282824]">Treasurer Approval Queue</h2>
+            </div>
+            <p class="text-xs text-[#282824]/70 mt-0.5">
+              Members registered with a Treasurer invite code receive Member privileges until you approve full expense management rights.
+            </p>
+          </div>
+          <span id="pending-treasurer-pill" class="text-xs font-bold px-3 py-1 rounded-full bg-[#C76B4A]/10 text-[#C76B4A]">
+            0 Pending
+          </span>
+        </div>
+
+        <div id="pending-treasurers-list" class="mt-4 space-y-3">
+          <!-- Populated by admin.js -->
+        </div>
+      </section>
+
+      <!-- SECTION A: Invitation Code Generator & List -->
+      <section aria-labelledby="invitation-heading" class="space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-[#A4A88A]/30 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[#A4A88A]/20">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-[#354B3A]">Security &amp; Access Control</span>
+              <h2 id="invitation-heading" class="font-serif text-xl font-bold text-[#282824] mt-0.5">Invitation Code Management</h2>
+              <p class="text-xs text-[#282824]/70 mt-0.5">
+                Every friend must be invited by you. Codes automatically bind the user to their designated role upon registration.
+              </p>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-[#A4A88A]">
+              <span class="inline-block px-2 py-0.5 rounded bg-[#F7F4EC] font-mono text-[11px] text-[#354B3A] border border-[#A4A88A]/30">CHRONICLES-M... (Member)</span>
+              <span class="inline-block px-2 py-0.5 rounded bg-[#F7F4EC] font-mono text-[11px] text-[#C76B4A] border border-[#A4A88A]/30">CHRONICLES-T... (Treasurer)</span>
+            </div>
+          </div>
+
+          <!-- Generator Form -->
+          <form id="generate-invite-form" class="mt-5 grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+            <div>
+              <label for="invite-role" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1.5">Assigned Role</label>
+              <select id="invite-role" class="w-full px-3 py-2.5 rounded-xl border border-[#A4A88A]/40 bg-white font-medium focus:outline-none focus:border-[#354B3A]">
+                <option value="Member" selected>Member (Standard Squad Access)</option>
+                <option value="Treasurer">Treasurer (Expense Management)</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="invite-max-uses" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1.5">Maximum Uses</label>
+              <input id="invite-max-uses" type="number" min="1" max="50" value="1"
+                     class="w-full px-3 py-2.5 rounded-xl border border-[#A4A88A]/40 bg-white font-medium focus:outline-none focus:border-[#354B3A]" />
+              <p class="text-[10px] text-[#A4A88A] mt-1">Default 1 for single-use personal code</p>
+            </div>
+
+            <div>
+              <label for="invite-expires" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1.5">Expiration Date (Optional)</label>
+              <input id="invite-expires" type="date"
+                     class="w-full px-3 py-2.5 rounded-xl border border-[#A4A88A]/40 bg-white font-medium focus:outline-none focus:border-[#354B3A]" />
+              <p class="text-[10px] text-[#A4A88A] mt-1">Leave empty for no expiry</p>
+            </div>
+
+            <div>
+              <label for="invite-note" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1.5">Note / Recipient</label>
+              <input id="invite-note" type="text" placeholder="e.g. For Rahul / Techfest coder"
+                     class="w-full px-3 py-2.5 rounded-xl border border-[#A4A88A]/40 bg-white font-medium focus:outline-none focus:border-[#354B3A]" />
+              <p class="text-[10px] text-[#A4A88A] mt-1">Private admin label</p>
+            </div>
+
+            <div class="md:col-span-4 flex items-center justify-end gap-3 pt-2">
+              <button type="submit" id="generate-code-btn"
+                      class="px-6 py-2.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-xs font-bold tracking-wide transition-all shadow-sm flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Generate Invitation Code
+              </button>
+            </div>
+          </form>
+
+          <!-- Freshly Generated Code Banner -->
+          <div id="generated-code-banner" class="hidden mt-6 p-4 rounded-xl bg-[#354B3A]/10 border border-[#354B3A]/30 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-[#354B3A]">New Invitation Code Ready</span>
+                <div class="flex items-center gap-3 mt-1">
+                  <span id="generated-code-text" class="font-mono text-xl sm:text-2xl font-bold tracking-wider text-[#282824] bg-white px-3 py-1 rounded-lg border border-[#354B3A]/20">
+                    CHRONICLES-XXXXXX
+                  </span>
+                  <span id="generated-code-role-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-[#354B3A] text-white">Member</span>
+                </div>
+                <p id="generated-code-details" class="text-xs text-[#282824]/80 mt-1.5">
+                  Single use • No expiration
+                </p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="copy-generated-code-btn" class="px-4 py-2 rounded-lg bg-[#354B3A] text-white text-xs font-bold hover:bg-[#243428] transition-colors flex items-center gap-1.5 shadow-sm">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                  </svg>
+                  <span id="copy-btn-text">Copy Code</span>
+                </button>
+                <button id="dismiss-generated-banner-btn" class="px-3 py-2 rounded-lg text-xs font-semibold text-[#A4A88A] hover:text-[#282824]">
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Invitation Codes Table / History -->
+        <div class="bg-white rounded-2xl p-6 border border-[#A4A88A]/30 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#A4A88A]/20">
+            <div>
+              <h3 class="font-serif text-lg font-bold text-[#282824]">Invitation Codes Directory</h3>
+              <p class="text-xs text-[#282824]/70 mt-0.5">Track code redemption, usage limits, and active status.</p>
+            </div>
+            <!-- Filter Tabs -->
+            <div class="flex items-center gap-1.5 bg-[#F7F4EC] p-1 rounded-xl border border-[#A4A88A]/30 text-xs flex-wrap">
+              <button class="invite-filter-btn px-2.5 py-1 rounded-lg font-bold text-[#354B3A] bg-white shadow-xs" data-filter="all">All</button>
+              <button class="invite-filter-btn px-2.5 py-1 rounded-lg font-semibold text-[#282824]/70 hover:text-[#354B3A]" data-filter="active">Active</button>
+              <button class="invite-filter-btn px-2.5 py-1 rounded-lg font-semibold text-[#282824]/70 hover:text-[#354B3A]" data-filter="used">Used / Depleted</button>
+              <button class="invite-filter-btn px-2.5 py-1 rounded-lg font-semibold text-[#282824]/70 hover:text-[#354B3A]" data-filter="expired">Expired</button>
+              <button class="invite-filter-btn px-2.5 py-1 rounded-lg font-semibold text-[#282824]/70 hover:text-[#354B3A]" data-filter="revoked">Revoked</button>
+            </div>
+          </div>
+
+          <!-- Codes Table Container -->
+          <div class="mt-4 overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-[#A4A88A]/20 text-[#A4A88A] uppercase tracking-wider font-semibold">
+                  <th class="py-2.5 px-3">Code</th>
+                  <th class="py-2.5 px-3">Role</th>
+                  <th class="py-2.5 px-3">Status</th>
+                  <th class="py-2.5 px-3">Usage</th>
+                  <th class="py-2.5 px-3">Redeemed By</th>
+                  <th class="py-2.5 px-3">Expires</th>
+                  <th class="py-2.5 px-3">Note</th>
+                  <th class="py-2.5 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="invites-table-body" class="divide-y divide-[#A4A88A]/15 text-[#282824]">
+                <!-- Populated by admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION B: Member Management -->
+      <section aria-labelledby="members-heading" class="bg-white rounded-2xl p-6 border border-[#A4A88A]/30 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#A4A88A]/20">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#354B3A]">Squad Registry</span>
+            <h2 id="members-heading" class="font-serif text-xl font-bold text-[#282824] mt-0.5">Member Management</h2>
+            <p class="text-xs text-[#282824]/70 mt-0.5">
+              Review all registered accounts. Switch roles between Member and Treasurer dynamically without disturbing their account.
+            </p>
+          </div>
+          <a href="squad.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#354B3A] hover:underline">
+            <span>View Public Squad</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+            </svg>
+          </a>
+        </div>
+
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-[#A4A88A]/20 text-[#A4A88A] uppercase tracking-wider font-semibold">
+                <th class="py-2.5 px-3">Member</th>
+                <th class="py-2.5 px-3">Email</th>
+                <th class="py-2.5 px-3">Role</th>
+                <th class="py-2.5 px-3">Status</th>
+                <th class="py-2.5 px-3">Joined Date</th>
+                <th class="py-2.5 px-3 text-right">Manage Role</th>
+              </tr>
+            </thead>
+            <tbody id="members-table-body" class="divide-y divide-[#A4A88A]/15 text-[#282824]">
+              <!-- Populated by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Shared Footer -->
+  <footer class="mt-20 border-t border-[#A4A88A]/30 bg-white/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#282824]/70">
+      <span>The 12 Chronicles • Admin Control Panel</span>
+      <div class="flex items-center gap-4 mt-2 sm:mt-0">
+        <a href="squad.html" class="hover:text-[#354B3A]">The Squad</a>
+        <a href="expenses.html" class="hover:text-[#354B3A]">Expenses</a>
+        <button onclick="window.openSupabaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline">
+          ⚡ Supabase Config
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

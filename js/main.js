@@ -1,317 +1,281 @@
 // The 12 Chronicles — Main Shared Controller & Global Navigation
 
 (function () {
-  // Setup Global Navigation Bar across all pages
+  "use strict";
+
+  const PRIVATE_LINKS = [
+    { name: "Schedule", href: "schedule.html" },
+    { name: "Explore", href: "explore.html" },
+    { name: "Hall of Fame", href: "hall-of-fame.html" },
+    { name: "Planner", href: "planner.html" },
+    { name: "Squad", href: "squad.html" },
+    { name: "Expenses", href: "expenses.html" },
+    { name: "Memories", href: "memories.html" }
+  ];
+
+  function escapeHtml(value) {
+    return String(value || "").replace(/[&<>"']/g, function (character) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[character];
+    });
+  }
+
+  function roleBadge(user) {
+    if (!user) return "";
+    const label = user.effectiveRole || "Member";
+    const isAdmin = label === "Admin";
+    const isPending = user.role === "Treasurer" && user.roleStatus === "pending";
+    const classes = isAdmin
+      ? "bg-[#C76B4A] text-white"
+      : isPending
+        ? "bg-[#C76B4A]/15 text-[#C76B4A]"
+        : label === "Treasurer"
+          ? "bg-[#354B3A] text-white"
+          : "bg-[#A4A88A]/30 text-[#354B3A]";
+    return '<span class="text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider ' +
+      classes + ' font-bold whitespace-nowrap">' + escapeHtml(isPending ? "Treasurer pending" : label) + "</span>";
+  }
+
   function initNavigation() {
-    const navContainer = document.getElementById('global-nav');
+    const navContainer = document.getElementById("global-nav");
     if (!navContainer) return;
 
-    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-    const currentUser = window.authService ? window.authService.getCurrentUser() : null;
-    const isAdmin = window.authService ? window.authService.isAdmin() : false;
-    const squad = window.authService ? window.authService.getAllMembers() : [];
+    const currentPath = window.location.pathname.split("/").pop() || "index.html";
+    const user = window.authService ? window.authService.getCurrentUser() : null;
+    const authenticated = !!user;
+    const isAdmin = !!(window.authService && window.authService.isAdmin());
+    const privateLinks = PRIVATE_LINKS.concat(isAdmin ? [{ name: "Admin", href: "admin.html" }] : []);
+    const navLinks = [{ name: "Home", href: "index.html" }].concat(authenticated ? privateLinks : []);
+    const avatar = user && user.avatar ? user.avatar : "";
+    const displayName = user ? (user.nickname || user.fullName) : "";
+    const pending = user && user.role === "Treasurer" && user.roleStatus === "pending";
 
-    const navLinks = [
-      { name: "Home", href: "index.html" },
-      { name: "Schedule", href: "schedule.html" },
-      { name: "Explore", href: "explore.html" },
-      { name: "Hall of Fame", href: "hall-of-fame.html" },
-      { name: "Planner", href: "planner.html" },
-      { name: "Squad", href: "squad.html" },
-      { name: "Expenses", href: "expenses.html" },
-      { name: "Memories", href: "memories.html" }
-    ];
+    const linkMarkup = function (link, mobile) {
+      const isActive = currentPath === link.href || (currentPath === "" && link.href === "index.html");
+      if (mobile) {
+        return '<a href="' + link.href + '" class="block px-3 py-2 text-base font-medium rounded-md ' +
+          (isActive ? "text-[#354B3A] bg-[#354B3A]/10 font-bold" : "text-[#282824]/80 hover:text-[#354B3A] hover:bg-[#A4A88A]/10") +
+          '">' + escapeHtml(link.name) + "</a>";
+      }
+      return '<a href="' + link.href + '" class="px-3.5 py-2 text-sm font-medium rounded-lg transition-all ' +
+        (isActive
+          ? "text-[#354B3A] bg-[#354B3A]/10 font-semibold"
+          : "text-[#282824]/80 hover:text-[#354B3A] hover:bg-[#A4A88A]/15") +
+        '">' + escapeHtml(link.name) + "</a>";
+    };
+
+    const guestActions = `
+      <div class="flex items-center gap-2">
+        <a href="auth.html?mode=login" class="px-3.5 py-2 text-sm font-semibold text-[#354B3A] rounded-lg hover:bg-[#354B3A]/10 transition-colors">
+          Log In
+        </a>
+        <a href="auth.html?mode=signup" class="px-4 py-2 text-sm font-semibold text-white bg-[#354B3A] hover:bg-[#243428] rounded-lg transition-colors shadow-sm">
+          Join with Invite
+        </a>
+      </div>
+    `;
+
+    const memberActions = authenticated ? `
+      <div class="relative" id="member-dropdown-container">
+        <button id="member-dropdown-btn" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-full border border-[#A4A88A]/40 bg-white hover:border-[#354B3A] transition-all shadow-sm">
+          <img src="${escapeHtml(avatar)}" alt="${escapeHtml(user.fullName)}" class="w-8 h-8 rounded-full object-cover ring-1 ring-[#354B3A]/20" />
+          <div class="text-left hidden md:block">
+            <div class="text-xs font-semibold text-[#282824] leading-tight flex items-center gap-1.5 max-w-[12rem]">
+              <span class="truncate">${escapeHtml(displayName)}</span>
+            </div>
+            <div class="mt-0.5">${roleBadge(user)}</div>
+          </div>
+          <svg class="w-3.5 h-3.5 text-[#282824]/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+
+        <div id="member-dropdown-menu" class="hidden absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-[#A4A88A]/30 py-2 z-50 animate-fade-in">
+          <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
+            <img src="${escapeHtml(avatar)}" class="w-10 h-10 rounded-full object-cover" alt="" />
+            <div class="min-w-0">
+              <p class="text-sm font-bold text-[#282824] truncate">${escapeHtml(user.fullName)}</p>
+              <p class="text-[11px] text-[#A4A88A] truncate">${escapeHtml(user.email)}</p>
+              <div class="mt-1">${roleBadge(user)}</div>
+            </div>
+          </div>
+          ${pending ? '<div class="mx-3 mt-2 p-2.5 rounded-lg bg-[#C76B4A]/10 border border-[#C76B4A]/25 text-[11px] text-[#8f3f26] leading-relaxed">Treasurer access is pending Admin approval. You have Member access for now.</div>' : ""}
+          <div class="py-1">
+            <a href="squad.html" class="block px-4 py-2 text-xs font-semibold text-[#282824] hover:bg-[#F7F4EC]">My Squad Profile</a>
+            ${isAdmin ? '<a href="admin.html" class="block px-4 py-2 text-xs font-semibold text-[#C76B4A] hover:bg-[#F7F4EC]">Admin Control Panel</a>' : ""}
+            ${window.authService && window.authService.canManageExpenses() ? '<a href="expenses.html" class="block px-4 py-2 text-xs font-semibold text-[#282824] hover:bg-[#F7F4EC]">Manage Expense Ledger</a>' : ""}
+          </div>
+          <div class="border-t border-gray-100 px-3 py-2">
+            <button id="member-logout-btn" class="w-full text-left px-3 py-2 text-xs font-bold text-[#C76B4A] rounded-lg hover:bg-[#C76B4A]/10 transition-colors">
+              Log Out
+            </button>
+          </div>
+        </div>
+      </div>
+    ` : "";
 
     navContainer.innerHTML = `
       <header class="sticky top-0 z-40 bg-[#F7F4EC]/90 backdrop-blur-md border-b border-[#A4A88A]/30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between h-20">
-            <!-- Brand Logo -->
-            <a href="index.html" class="flex items-center gap-3 group">
-              <div class="w-10 h-10 rounded-full bg-[#354B3A] text-white flex items-center justify-center font-serif text-lg font-bold group-hover:bg-[#C76B4A] transition-colors shadow-sm">
-                12
-              </div>
+          <div class="flex items-center justify-between h-20 gap-4">
+            <a href="index.html" class="flex items-center gap-3 group flex-shrink-0">
+              <div class="w-10 h-10 rounded-full bg-[#354B3A] text-white flex items-center justify-center font-serif text-lg font-bold group-hover:bg-[#C76B4A] transition-colors shadow-sm">12</div>
               <div>
-                <span class="font-serif font-bold text-xl sm:text-2xl text-[#282824] tracking-tight group-hover:text-[#354B3A] transition-colors">
-                  The 12 Chronicles
-                </span>
-                <span class="hidden md:block text-[11px] uppercase tracking-widest text-[#A4A88A] font-semibold">
-                  IIT Bombay Techfest × Mumbai 2026
-                </span>
+                <span class="font-serif font-bold text-xl sm:text-2xl text-[#282824] tracking-tight group-hover:text-[#354B3A] transition-colors">The 12 Chronicles</span>
+                <span class="hidden md:block text-[11px] uppercase tracking-widest text-[#A4A88A] font-semibold">IIT Bombay Techfest × Mumbai 2026</span>
               </div>
             </a>
 
-            <!-- Desktop Navigation Links -->
             <nav class="hidden lg:flex items-center space-x-1">
-              ${navLinks.map(link => {
-                const isActive = (currentPath === link.href) || (currentPath === '' && link.href === 'index.html');
-                return `
-                  <a href="${link.href}" 
-                     class="px-3.5 py-2 text-sm font-medium rounded-lg transition-all ${
-                       isActive 
-                         ? 'text-[#354B3A] bg-[#354B3A]/10 font-semibold' 
-                         : 'text-[#282824]/80 hover:text-[#354B3A] hover:bg-[#A4A88A]/15'
-                     }">
-                    ${link.name}
-                  </a>
-                `;
-              }).join('')}
+              ${navLinks.map(function (link) { return linkMarkup(link, false); }).join("")}
             </nav>
 
-            <!-- User / Squad Profile Switcher -->
             <div class="hidden sm:flex items-center gap-3">
-              <div class="relative" id="squad-dropdown-container">
-                <button id="squad-dropdown-btn" 
-                        class="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-[#A4A88A]/40 bg-white hover:border-[#354B3A] transition-all shadow-sm">
-                  <img src="${currentUser ? currentUser.avatar : ''}" alt="${currentUser ? currentUser.name : ''}" 
-                       class="w-7 h-7 rounded-full object-cover ring-1 ring-[#354B3A]/20" />
-                  <div class="text-left">
-                    <div class="text-xs font-semibold text-[#282824] leading-tight flex items-center gap-1.5">
-                      <span>${currentUser ? currentUser.nickname : 'Squad Member'}</span>
-                      <span class="text-[9px] px-1.5 py-0.2 rounded-full uppercase tracking-wider ${isAdmin ? 'bg-[#C76B4A] text-white' : 'bg-[#A4A88A]/30 text-[#354B3A]'} font-bold">
-                        ${currentUser ? currentUser.role : 'Member'}
-                      </span>
-                    </div>
-                  </div>
-                  <svg class="w-3.5 h-3.5 text-[#282824]/60 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </button>
-
-                <!-- Dropdown Menu for all 12 Squad Members -->
-                <div id="squad-dropdown-menu" 
-                     class="hidden absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-[#A4A88A]/30 py-2 z-50 animate-fade-in max-h-96 overflow-y-auto">
-                  <div class="px-4 py-2 border-b border-gray-100">
-                    <p class="text-[11px] uppercase tracking-wider font-bold text-[#A4A88A]">Switch Member Identity</p>
-                    <p class="text-xs text-[#282824]/70">Test roles & admin features instantly</p>
-                  </div>
-                  <div class="py-1">
-                    ${squad.map(m => `
-                      <button data-switch-id="${m.id}" 
-                              class="w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-[#F7F4EC] transition-colors ${m.id === (currentUser ? currentUser.id : '') ? 'bg-[#F7F4EC] font-semibold' : ''}">
-                        <img src="${m.avatar}" class="w-7 h-7 rounded-full object-cover" />
-                        <div class="flex-1 min-w-0">
-                          <p class="text-xs text-[#282824] truncate flex items-center justify-between">
-                            <span>${m.name}</span>
-                            <span class="text-[9px] px-1.5 py-0.2 rounded-full ${m.role === 'Admin' ? 'bg-[#C76B4A]/15 text-[#C76B4A]' : 'bg-gray-100 text-gray-600'} font-bold">${m.role}</span>
-                          </p>
-                          <p class="text-[10px] text-[#A4A88A] truncate">"${m.nickname}" • ${m.tripRole}</p>
-                        </div>
-                      </button>
-                    `).join('')}
-                  </div>
-                  <div class="border-t border-gray-100 px-4 py-2">
-                    <button id="open-invite-modal-btn" class="w-full text-center text-xs text-[#354B3A] font-semibold hover:underline">
-                      🔑 Enter Squad Invite Code
-                    </button>
-                  </div>
-                </div>
-              </div>
+              ${authenticated ? memberActions : guestActions}
             </div>
 
-            <!-- Mobile Hamburger Button -->
             <div class="flex items-center lg:hidden gap-2">
-              <button id="mobile-menu-btn" 
-                      class="p-2 rounded-lg text-[#282824] hover:bg-[#A4A88A]/20 transition-colors"
-                      aria-label="Toggle Navigation">
+              <button id="mobile-menu-btn" class="p-2 rounded-lg text-[#282824] hover:bg-[#A4A88A]/20 transition-colors" aria-label="Toggle Navigation" aria-expanded="false">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path id="hamburger-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Mobile Drawer -->
         <div id="mobile-nav" class="hidden lg:hidden border-t border-[#A4A88A]/20 bg-[#F7F4EC] px-4 pt-3 pb-6 space-y-1">
-          ${navLinks.map(link => {
-            const isActive = (currentPath === link.href) || (currentPath === '' && link.href === 'index.html');
-            return `
-              <a href="${link.href}" 
-                 class="block px-3 py-2 text-base font-medium rounded-md ${
-                   isActive 
-                     ? 'text-[#354B3A] bg-[#354B3A]/10 font-bold' 
-                     : 'text-[#282824]/80 hover:text-[#354B3A] hover:bg-[#A4A88A]/10'
-                 }">
-                ${link.name}
-              </a>
-            `;
-          }).join('')}
-          
-          <!-- Mobile Member Switcher -->
-          <div class="pt-4 border-t border-[#A4A88A]/20 mt-3">
-            <p class="text-xs uppercase tracking-wider text-[#A4A88A] font-bold px-3 mb-2">Active Squad Member</p>
-            <div class="flex items-center gap-3 px-3 py-2 bg-white rounded-lg border border-[#A4A88A]/30">
-              <img src="${currentUser ? currentUser.avatar : ''}" class="w-9 h-9 rounded-full object-cover" />
-              <div>
-                <p class="text-sm font-semibold text-[#282824]">${currentUser ? currentUser.name : ''}</p>
-                <p class="text-xs text-[#A4A88A]">${currentUser ? currentUser.nickname : ''} (${currentUser ? currentUser.role : ''})</p>
+          ${navLinks.map(function (link) { return linkMarkup(link, true); }).join("")}
+          <div class="pt-4 mt-3 border-t border-[#A4A88A]/20">
+            ${authenticated ? `
+              <div class="flex items-center gap-3 px-3 py-2 bg-white rounded-lg border border-[#A4A88A]/30">
+                <img src="${escapeHtml(avatar)}" class="w-9 h-9 rounded-full object-cover" alt="" />
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold text-[#282824] truncate">${escapeHtml(user.fullName)}</p>
+                  <p class="text-xs text-[#A4A88A] truncate">${escapeHtml(user.email)}</p>
+                </div>
               </div>
-            </div>
+              <div class="mt-2 px-3">${roleBadge(user)}</div>
+              <a href="squad.html" class="block mt-3 px-3 py-2 text-sm font-semibold text-[#354B3A] rounded-lg hover:bg-[#354B3A]/10">My Squad Profile</a>
+              ${isAdmin ? '<a href="admin.html" class="block px-3 py-2 text-sm font-semibold text-[#C76B4A] rounded-lg hover:bg-[#C76B4A]/10">Admin Control Panel</a>' : ""}
+              <button id="mobile-logout-btn" class="w-full text-left mt-1 px-3 py-2 text-sm font-bold text-[#C76B4A] rounded-lg hover:bg-[#C76B4A]/10">Log Out</button>
+            ` : `
+              <a href="auth.html?mode=login" class="block px-3 py-2.5 text-sm font-semibold text-[#354B3A] rounded-lg hover:bg-[#354B3A]/10">Log In</a>
+              <a href="auth.html?mode=signup" class="block mt-1 px-3 py-2.5 text-sm font-semibold text-white bg-[#354B3A] rounded-lg text-center">Join with Invite</a>
+            `}
           </div>
         </div>
       </header>
     `;
 
-    // Dropdown toggle logic
-    const dropdownBtn = document.getElementById('squad-dropdown-btn');
-    const dropdownMenu = document.getElementById('squad-dropdown-menu');
+    const dropdownBtn = document.getElementById("member-dropdown-btn");
+    const dropdownMenu = document.getElementById("member-dropdown-menu");
     if (dropdownBtn && dropdownMenu) {
-      dropdownBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdownMenu.classList.toggle('hidden');
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!dropdownMenu.contains(e.target) && !dropdownBtn.contains(e.target)) {
-          dropdownMenu.classList.add('hidden');
-        }
-      });
-
-      // Member switch click
-      dropdownMenu.querySelectorAll('[data-switch-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-switch-id');
-          window.authService.switchMember(id);
-          showToast(`Switched active squad member to ${window.authService.getCurrentUser().name}`, 'info');
-          initNavigation();
-          dropdownMenu.classList.add('hidden');
-        });
+      dropdownBtn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        dropdownMenu.classList.toggle("hidden");
       });
     }
 
-    // Mobile menu toggle logic
-    const mobileBtn = document.getElementById('mobile-menu-btn');
-    const mobileNav = document.getElementById('mobile-nav');
+    const logoutBtn = document.getElementById("member-logout-btn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", function () {
+        window.authService.logout();
+      });
+    }
+
+    const mobileLogoutBtn = document.getElementById("mobile-logout-btn");
+    if (mobileLogoutBtn) {
+      mobileLogoutBtn.addEventListener("click", function () {
+        window.authService.logout();
+      });
+    }
+
+    const mobileBtn = document.getElementById("mobile-menu-btn");
+    const mobileNav = document.getElementById("mobile-nav");
     if (mobileBtn && mobileNav) {
-      mobileBtn.addEventListener('click', () => {
-        mobileNav.classList.toggle('hidden');
-      });
-    }
-
-    // Invite code modal button
-    const inviteBtn = document.getElementById('open-invite-modal-btn');
-    if (inviteBtn) {
-      inviteBtn.addEventListener('click', () => {
-        if (dropdownMenu) dropdownMenu.classList.add('hidden');
-        openInviteModal();
+      mobileBtn.addEventListener("click", function () {
+        const hidden = mobileNav.classList.toggle("hidden");
+        mobileBtn.setAttribute("aria-expanded", hidden ? "false" : "true");
       });
     }
   }
 
+  document.addEventListener("click", function (event) {
+    const dropdownMenu = document.getElementById("member-dropdown-menu");
+    const dropdownBtn = document.getElementById("member-dropdown-btn");
+    if (!dropdownMenu || !dropdownBtn) return;
+    if (!dropdownMenu.contains(event.target) && !dropdownBtn.contains(event.target)) {
+      dropdownMenu.classList.add("hidden");
+    }
+  });
+
   // Toast Notification System
-  window.showToast = function (message, type = 'success') {
-    let container = document.getElementById('toast-container');
+  window.showToast = function (message, type) {
+    const kind = type || "success";
+    let container = document.getElementById("toast-container");
     if (!container) {
-      container = document.createElement('div');
-      container.id = 'toast-container';
-      container.className = 'fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none';
+      container = document.createElement("div");
+      container.id = "toast-container";
+      container.className = "fixed bottom-5 right-5 z-[70] flex flex-col gap-2 max-w-sm pointer-events-none";
       document.body.appendChild(container);
     }
 
-    const toast = document.createElement('div');
-    toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium transition-all duration-300 transform translate-y-3 opacity-0 ${
-      type === 'success' 
-        ? 'bg-[#354B3A] text-white border-[#354B3A]' 
-        : type === 'error'
-        ? 'bg-[#C76B4A] text-white border-[#C76B4A]'
-        : 'bg-[#282824] text-white border-[#282824]'
-    }`;
+    const toast = document.createElement("div");
+    toast.className = "pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium transition-all duration-300 transform translate-y-3 opacity-0 " +
+      (kind === "success"
+        ? "bg-[#354B3A] text-white border-[#354B3A]"
+        : kind === "error"
+          ? "bg-[#C76B4A] text-white border-[#C76B4A]"
+          : "bg-[#282824] text-white border-[#282824]");
 
-    toast.innerHTML = `
-      <span class="flex-1">${message}</span>
-      <button class="text-white/70 hover:text-white" onclick="this.parentElement.remove()">✕</button>
-    `;
+    toast.innerHTML = '<span class="flex-1">' + escapeHtml(message) + '</span>' +
+      '<button class="text-white/70 hover:text-white" aria-label="Dismiss">✕</button>';
+    toast.querySelector("button").addEventListener("click", function () { toast.remove(); });
 
     container.appendChild(toast);
-    requestAnimationFrame(() => {
-      toast.classList.remove('translate-y-3', 'opacity-0');
+    requestAnimationFrame(function () {
+      toast.classList.remove("translate-y-3", "opacity-0");
     });
 
-    setTimeout(() => {
-      toast.classList.add('opacity-0', 'translate-y-3');
-      setTimeout(() => toast.remove(), 300);
-    }, 3800);
+    setTimeout(function () {
+      toast.classList.add("opacity-0", "translate-y-3");
+      setTimeout(function () { toast.remove(); }, 300);
+    }, 4200);
   };
 
-  // Invite Code Modal
-  window.openInviteModal = function () {
-    let modal = document.getElementById('squad-invite-modal');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'squad-invite-modal';
-      modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop animate-fade-in';
-      modal.innerHTML = `
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#A4A88A]/30">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-serif text-xl font-bold text-[#282824]">Enter Squad Invite Code</h3>
-            <button onclick="document.getElementById('squad-invite-modal').remove()" class="text-gray-400 hover:text-[#282824]">✕</button>
-          </div>
-          <p class="text-xs text-[#282824]/70 mb-4">
-            "The 12 Chronicles" is private to the 12 verified members. Enter your group passkey:
-          </p>
-          <div class="space-y-4">
-            <div>
-              <label class="block text-xs font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Squad Passkey</label>
-              <input id="invite-code-input" type="password" value="TECHFEST2026" placeholder="Enter passkey (e.g. TECHFEST2026)"
-                     class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A]" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Select Your Name</label>
-              <select id="invite-member-select" class="w-full px-3.5 py-2.5 rounded-lg border border-[#A4A88A]/40 text-sm focus:outline-none focus:border-[#354B3A]">
-                ${window.authService.getAllMembers().map(m => `
-                  <option value="${m.id}">${m.name} (${m.nickname}) — ${m.role}</option>
-                `).join('')}
-              </select>
-            </div>
-            <div class="p-3 bg-[#F7F4EC] rounded-lg text-xs text-[#354B3A]">
-              💡 <strong>Squad Tip:</strong> Default passkey is <code class="font-mono bg-white px-1.5 py-0.5 rounded">TECHFEST2026</code>.
-            </div>
-            <div class="flex gap-2 pt-2">
-              <button onclick="document.getElementById('squad-invite-modal').remove()" 
-                      class="flex-1 px-4 py-2.5 rounded-lg border border-[#A4A88A]/40 text-xs font-semibold text-[#282824] hover:bg-gray-50">
-                Cancel
-              </button>
-              <button id="submit-invite-btn" 
-                      class="flex-1 px-4 py-2.5 rounded-lg bg-[#354B3A] hover:bg-[#243428] text-white text-xs font-semibold transition-colors">
-                Unlock Access
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-
-      document.getElementById('submit-invite-btn').addEventListener('click', () => {
-        const code = document.getElementById('invite-code-input').value;
-        const memberId = document.getElementById('invite-member-select').value;
-        try {
-          window.authService.loginWithInviteCode(code, memberId);
-          showToast(`Welcome aboard, ${window.authService.getCurrentUser().name}!`, 'success');
-          modal.remove();
-          initNavigation();
-        } catch (err) {
-          showToast(err.message, 'error');
-        }
-      });
+  function showStoredFlash() {
+    try {
+      const raw = sessionStorage.getItem("chronicles_flash");
+      if (!raw) return;
+      sessionStorage.removeItem("chronicles_flash");
+      const flash = JSON.parse(raw);
+      if (flash && flash.message) {
+        window.showToast(flash.message, flash.type || "success");
+      }
+    } catch (error) {
+      /* ignore malformed flash messages */
     }
-  };
+  }
 
   // Live Countdown Timer to IIT Bombay Techfest 2026
   window.initCountdownTimer = function () {
-    const daysEl = document.getElementById('countdown-days');
-    const hoursEl = document.getElementById('countdown-hours');
-    const minutesEl = document.getElementById('countdown-minutes');
-    const secondsEl = document.getElementById('countdown-seconds');
+    const daysEl = document.getElementById("countdown-days");
+    const hoursEl = document.getElementById("countdown-hours");
+    const minutesEl = document.getElementById("countdown-minutes");
+    const secondsEl = document.getElementById("countdown-seconds");
 
     if (!daysEl) return;
 
-    // Techfest 2026 starts Dec 25, 2026 09:00 AM IST
-    const targetDate = new Date('2026-12-25T09:00:00+05:30').getTime();
+    const targetDate = new Date("2026-12-25T09:00:00+05:30").getTime();
 
     function update() {
-      const now = new Date().getTime();
-      const distance = targetDate - now;
+      const distance = targetDate - new Date().getTime();
 
       if (distance < 0) {
         if (daysEl) daysEl.innerText = "00";
@@ -326,93 +290,84 @@
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      if (daysEl) daysEl.innerText = String(days).padStart(2, '0');
-      if (hoursEl) hoursEl.innerText = String(hours).padStart(2, '0');
-      if (minutesEl) minutesEl.innerText = String(minutes).padStart(2, '0');
-      if (secondsEl) secondsEl.innerText = String(seconds).padStart(2, '0');
+      if (daysEl) daysEl.innerText = String(days).padStart(2, "0");
+      if (hoursEl) hoursEl.innerText = String(hours).padStart(2, "0");
+      if (minutesEl) minutesEl.innerText = String(minutes).padStart(2, "0");
+      if (secondsEl) secondsEl.innerText = String(seconds).padStart(2, "0");
     }
 
     update();
     setInterval(update, 1000);
   };
 
-  // Firebase Configuration Modal
-  window.openFirebaseSettingsModal = function () {
-    let modal = document.getElementById('firebase-settings-modal');
+  // Supabase Configuration Modal
+  window.openSupabaseSettingsModal = function () {
+    let modal = document.getElementById("supabase-settings-modal");
     if (!modal) {
-      const cfg = window.firebaseConfig || {};
-      modal = document.createElement('div');
-      modal.id = 'firebase-settings-modal';
-      modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop animate-fade-in';
+      const cfg = window.supabaseConfig || {};
+      modal = document.createElement("div");
+      modal.id = "supabase-settings-modal";
+      modal.className = "fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop animate-fade-in";
       modal.innerHTML = `
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#A4A88A]/30">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#A4A88A]/30 max-h-[90vh] overflow-y-auto">
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-2">
-              <span class="text-xl">🔥</span>
-              <h3 class="font-serif text-xl font-bold text-[#282824]">Firebase Cloud Integration</h3>
+              <span class="text-xl">⚡</span>
+              <h3 class="font-serif text-xl font-bold text-[#282824]">Supabase Connection</h3>
             </div>
-            <button onclick="document.getElementById('firebase-settings-modal').remove()" class="text-gray-400 hover:text-[#282824]">✕</button>
+            <button id="close-supabase-cfg-btn" class="text-gray-400 hover:text-[#282824]">✕</button>
           </div>
-          <p class="text-xs text-[#282824]/70 mb-4">
-            The website currently operates with a high-fidelity local real-time sync layer. To connect to your live Firebase project (Firestore + Storage + Auth), paste your credentials:
+          <p class="text-xs text-[#282824]/70 mb-4 leading-relaxed">
+            The 12 Chronicles uses Supabase for Authentication, PostgreSQL, Realtime sync, and Storage. Enter your Project URL and public anon key below.
           </p>
           <div class="space-y-3 text-xs">
             <div>
-              <label class="block font-semibold text-[#A4A88A] uppercase mb-1">API Key</label>
-              <input id="fb-apikey" class="w-full px-3 py-2 border rounded-lg" value="${cfg.apiKey || ''}" />
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block font-semibold text-[#A4A88A] uppercase mb-1">Project ID</label>
-                <input id="fb-projid" class="w-full px-3 py-2 border rounded-lg" value="${cfg.projectId || ''}" />
-              </div>
-              <div>
-                <label class="block font-semibold text-[#A4A88A] uppercase mb-1">Auth Domain</label>
-                <input id="fb-domain" class="w-full px-3 py-2 border rounded-lg" value="${cfg.authDomain || ''}" />
-              </div>
+              <label class="block font-semibold text-[#A4A88A] uppercase mb-1">Supabase Project URL</label>
+              <input id="sb-url" class="w-full px-3 py-2 border rounded-lg font-mono text-xs" placeholder="https://your-project-id.supabase.co" value="${escapeHtml(cfg.supabaseUrl || "")}" />
             </div>
             <div>
-              <label class="block font-semibold text-[#A4A88A] uppercase mb-1">Storage Bucket</label>
-              <input id="fb-bucket" class="w-full px-3 py-2 border rounded-lg" value="${cfg.storageBucket || ''}" />
+              <label class="block font-semibold text-[#A4A88A] uppercase mb-1">Supabase Anon Public Key</label>
+              <textarea id="sb-key" rows="3" class="w-full px-3 py-2 border rounded-lg font-mono text-xs" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">${escapeHtml(cfg.supabaseAnonKey || "")}</textarea>
             </div>
           </div>
           <div class="flex gap-2 mt-5">
-            <button onclick="document.getElementById('firebase-settings-modal').remove()" class="flex-1 py-2 rounded-lg border text-xs font-semibold">
-              Close
+            <button id="clear-supabase-cfg-btn" class="px-3 py-2 rounded-lg border text-xs font-semibold text-[#C76B4A] hover:bg-[#C76B4A]/10">
+              Clear Keys
             </button>
-            <button id="save-firebase-cfg-btn" class="flex-1 py-2 rounded-lg bg-[#354B3A] text-white text-xs font-semibold hover:bg-[#243428]">
-              Save & Connect
+            <button id="save-supabase-cfg-btn" class="flex-1 py-2 rounded-lg bg-[#354B3A] text-white text-xs font-semibold hover:bg-[#243428]">
+              Connect &amp; Reload
             </button>
           </div>
         </div>
       `;
       document.body.appendChild(modal);
 
-      document.getElementById('save-firebase-cfg-btn').addEventListener('click', () => {
+      document.getElementById("close-supabase-cfg-btn").addEventListener("click", function () { modal.remove(); });
+      document.getElementById("clear-supabase-cfg-btn").addEventListener("click", function () {
+        localStorage.removeItem("chronicles_supabase_config");
+        window.location.reload();
+      });
+      document.getElementById("save-supabase-cfg-btn").addEventListener("click", function () {
         const newCfg = {
-          apiKey: document.getElementById('fb-apikey').value.trim(),
-          projectId: document.getElementById('fb-projid').value.trim(),
-          authDomain: document.getElementById('fb-domain').value.trim(),
-          storageBucket: document.getElementById('fb-bucket').value.trim(),
-          messagingSenderId: "123456789012",
-          appId: "1:123456789012:web:demo"
+          supabaseUrl: document.getElementById("sb-url").value.trim(),
+          supabaseAnonKey: document.getElementById("sb-key").value.trim()
         };
-        localStorage.setItem('chronicles_firebase_config', JSON.stringify(newCfg));
-        showToast('Firebase configuration saved successfully!', 'success');
-        modal.remove();
-        setTimeout(() => window.location.reload(), 1000);
+        localStorage.setItem("chronicles_supabase_config", JSON.stringify(newCfg));
+        window.showToast("Supabase configuration saved. Connecting…", "success");
+        setTimeout(function () { window.location.reload(); }, 700);
       });
     }
   };
 
-  // Initialize on DOM load
-  document.addEventListener('DOMContentLoaded', () => {
+  // Backward compatibility alias
+  window.openFirebaseSettingsModal = window.openSupabaseSettingsModal;
+
+  document.addEventListener("DOMContentLoaded", function () {
     initNavigation();
     initCountdownTimer();
+    showStoredFlash();
 
-    // Listen for auth change
-    window.addEventListener('chronicles:authChanged', () => {
-      initNavigation();
-    });
+    window.addEventListener("chronicles:authChanged", initNavigation);
+    window.addEventListener("chronicles:membersChanged", initNavigation);
   });
 })();

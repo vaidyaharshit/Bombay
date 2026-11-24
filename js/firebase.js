@@ -2,6 +2,82 @@
 // Provides full Firestore & Firebase Storage support with automatic offline/local fallback.
 
 (function () {
+  const EXPENSE_CATEGORIES_KEY = 'chronicles_expense_categories';
+  const DEFAULT_EXPENSE_CATEGORIES = ['Food', 'Travel', 'Hotel', 'Sightseeing', 'Shopping', 'Other'];
+  const EXPENSES_COLLECTION = (window.GROUP_CONFIG && window.GROUP_CONFIG.collections && window.GROUP_CONFIG.collections.expenses) || 'expenses';
+  const SETTINGS_COLLECTION = (window.GROUP_CONFIG && window.GROUP_CONFIG.collections && window.GROUP_CONFIG.collections.settings) || 'settings';
+
+  function getFirestoreDb() {
+    return window.chroniclesFirebase && window.chroniclesFirebase.db ? window.chroniclesFirebase.db : null;
+  }
+
+  function getAuthUser() {
+    return window.authService ? window.authService.getCurrentUser() : null;
+  }
+
+  function requireExpenseManager() {
+    if (!window.authService || !window.authService.canManageExpenses()) {
+      throw new Error('Only an approved Treasurer or Admin can modify the shared expense ledger.');
+    }
+    const user = getAuthUser();
+    if (!user) {
+      throw new Error('Please log in before managing expenses.');
+    }
+    return user;
+  }
+
+  function isoNow() {
+    return new Date().toISOString();
+  }
+
+  function normalizeExpense(expense) {
+    const source = expense || {};
+    const splitBetween = Array.isArray(source.splitBetween) && source.splitBetween.length
+      ? source.splitBetween.slice()
+      : (Array.isArray(source.splitMembers) ? source.splitMembers.slice() : []);
+    return {
+      id: source.id || '',
+      title: source.title || '',
+      description: source.description || source.notes || '',
+      amount: Number(source.amount || 0),
+      category: source.category || 'Other',
+      date: source.date || '',
+      paidById: source.paidById || '',
+      paidByName: source.paidByName || '',
+      splitType: source.splitType || 'equal',
+      splitBetween: splitBetween,
+      splitMembers: splitBetween,
+      paymentStatus: source.paymentStatus || 'pending',
+      createdBy: source.createdBy || '',
+      createdByName: source.createdByName || source.paidByName || '',
+      createdAt: source.createdAt || source.date || '',
+      updatedBy: source.updatedBy || '',
+      updatedByName: source.updatedByName || '',
+      updatedAt: source.updatedAt || source.createdAt || source.date || ''
+    };
+  }
+
+  function sortExpenses(items) {
+    return items.slice().sort(function (a, b) {
+      const first = String(b.date || b.createdAt || '');
+      const second = String(a.date || a.createdAt || '');
+      return first.localeCompare(second);
+    });
+  }
+
+  function readLocalCategories() {
+    try {
+      const raw = localStorage.getItem(EXPENSE_CATEGORIES_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (Array.isArray(parsed) && parsed.length) {
+        return parsed.filter(function (item) { return typeof item === 'string' && item.trim(); });
+      }
+    } catch (error) {
+      console.warn('Could not read expense categories:', error);
+    }
+    return DEFAULT_EXPENSE_CATEGORIES.slice();
+  }
+
   // Preloaded authentic initial dataset for the 12 squad
   const INITIAL_SCHEDULE = [
     {
@@ -264,57 +340,6 @@
     }
   ];
 
-  const INITIAL_EXPENSES = [
-    {
-      id: "exp_1",
-      title: "Round-Trip Express Train Bookings (12 Pax)",
-      amount: 19800,
-      category: "Travel",
-      paidById: "mem_4",
-      paidByName: "Siddharth Rao",
-      splitType: "equal",
-      splitMembers: ["mem_1", "mem_2", "mem_3", "mem_4", "mem_5", "mem_6", "mem_7", "mem_8", "mem_9", "mem_10", "mem_11", "mem_12"],
-      date: "2026-11-01",
-      notes: "IRCTC 3-Tier AC coach reservations for all 12 confirmed."
-    },
-    {
-      id: "exp_2",
-      title: "Powai Residency Quad Rooms (3 Nights Advance)",
-      amount: 27000,
-      category: "Hotel",
-      paidById: "mem_1",
-      paidByName: "Aryan Sharma",
-      splitType: "equal",
-      splitMembers: ["mem_1", "mem_2", "mem_3", "mem_4", "mem_5", "mem_6", "mem_7", "mem_8", "mem_9", "mem_10", "mem_11", "mem_12"],
-      date: "2026-11-04",
-      notes: "3 Quad sharing rooms booked near IIT Bombay Main Gate."
-    },
-    {
-      id: "exp_3",
-      title: "Techfest Official Team Registrations & Kits",
-      amount: 3600,
-      category: "Sightseeing",
-      paidById: "mem_8",
-      paidByName: "Vihaan Joshi",
-      splitType: "equal",
-      splitMembers: ["mem_1", "mem_2", "mem_3", "mem_4", "mem_5", "mem_6", "mem_7", "mem_8", "mem_9", "mem_10", "mem_11", "mem_12"],
-      date: "2026-11-05",
-      notes: "All 12 delegate passes and hackathon participation kits."
-    },
-    {
-      id: "exp_4",
-      title: "Emergency Medical & First-Aid Travel Pouch",
-      amount: 1250,
-      category: "Other",
-      paidById: "mem_9",
-      paidByName: "Aditi Patel",
-      splitType: "equal",
-      splitMembers: ["mem_1", "mem_2", "mem_3", "mem_4", "mem_5", "mem_6", "mem_7", "mem_8", "mem_9", "mem_10", "mem_11", "mem_12"],
-      date: "2026-11-06",
-      notes: "ORS sachets, bandages, motion sickness pills, Volini spray."
-    }
-  ];
-
   const INITIAL_PHOTOS = [
     {
       id: "pho_1",
@@ -567,9 +592,6 @@
       if (!localStorage.getItem('chronicles_destinations')) {
         localStorage.setItem('chronicles_destinations', JSON.stringify(INITIAL_DESTINATIONS));
       }
-      if (!localStorage.getItem('chronicles_expenses')) {
-        localStorage.setItem('chronicles_expenses', JSON.stringify(INITIAL_EXPENSES));
-      }
       if (!localStorage.getItem('chronicles_photos')) {
         localStorage.setItem('chronicles_photos', JSON.stringify(INITIAL_PHOTOS));
       }
@@ -666,28 +688,175 @@
       return false;
     },
 
-    // Expenses API
+    // Expenses API — Firestore when configured, local preview otherwise
     async getExpenses() {
-      return localStore.get('expenses');
+      const db = getFirestoreDb();
+      if (db) {
+        const snapshot = await db.collection(EXPENSES_COLLECTION).get();
+        return sortExpenses(snapshot.docs.map(function (doc) {
+          return normalizeExpense(Object.assign({ id: doc.id }, doc.data() || {}));
+        }));
+      }
+      return sortExpenses(localStore.get('expenses').map(normalizeExpense));
+    },
+
+    subscribeExpenses(callback) {
+      const db = getFirestoreDb();
+      if (db) {
+        return db.collection(EXPENSES_COLLECTION).onSnapshot(
+          function (snapshot) {
+            const items = sortExpenses(snapshot.docs.map(function (doc) {
+              return normalizeExpense(Object.assign({ id: doc.id }, doc.data() || {}));
+            }));
+            callback(items);
+          },
+          function (error) {
+            console.warn('Expense listener stopped:', error);
+            callback(sortExpenses(localStore.get('expenses').map(normalizeExpense)));
+          }
+        );
+      }
+
+      const handler = function () {
+        callback(sortExpenses(localStore.get('expenses').map(normalizeExpense)));
+      };
+      const storageHandler = function (event) {
+        if (event.key === 'chronicles_expenses') handler();
+      };
+      window.addEventListener('chronicles:expensesUpdated', handler);
+      window.addEventListener('storage', storageHandler);
+      handler();
+      return function () {
+        window.removeEventListener('chronicles:expensesUpdated', handler);
+        window.removeEventListener('storage', storageHandler);
+      };
     },
 
     async addExpense(expense) {
-      const expenses = localStore.get('expenses');
-      const newExp = {
-        id: 'exp_' + Date.now(),
-        date: new Date().toISOString().split('T')[0],
-        ...expense
-      };
-      expenses.unshift(newExp);
-      localStore.set('expenses', expenses);
-      return newExp;
+      const user = requireExpenseManager();
+      const payload = normalizeExpense(Object.assign({}, expense, {
+        id: '',
+        createdBy: user.uid,
+        createdByName: user.fullName,
+        createdAt: isoNow(),
+        updatedBy: user.uid,
+        updatedByName: user.fullName,
+        updatedAt: isoNow()
+      }));
+
+      const db = getFirestoreDb();
+      if (db) {
+        const reference = db.collection(EXPENSES_COLLECTION).doc();
+        payload.id = reference.id;
+        await reference.set(payload);
+        return payload;
+      }
+
+      const expenses = localStore.get('expenses').map(normalizeExpense);
+      payload.id = 'exp_' + Date.now();
+      expenses.unshift(payload);
+      localStore.set('expenses', sortExpenses(expenses));
+      return payload;
+    },
+
+    async updateExpense(id, updates) {
+      const user = requireExpenseManager();
+      const db = getFirestoreDb();
+      if (db) {
+        const reference = db.collection(EXPENSES_COLLECTION).doc(id);
+        const snapshot = await reference.get();
+        if (!snapshot.exists) throw new Error('This expense could not be found.');
+        const current = normalizeExpense(Object.assign({ id: id }, snapshot.data() || {}));
+        const payload = normalizeExpense(Object.assign({}, current, updates, {
+          id: id,
+          createdBy: current.createdBy,
+          createdByName: current.createdByName,
+          createdAt: current.createdAt,
+          updatedBy: user.uid,
+          updatedByName: user.fullName,
+          updatedAt: isoNow()
+        }));
+        await reference.set(payload, { merge: true });
+        return payload;
+      }
+
+      const expenses = localStore.get('expenses').map(normalizeExpense);
+      const index = expenses.findIndex(function (item) { return item.id === id; });
+      if (index === -1) throw new Error('This expense could not be found.');
+      const current = expenses[index];
+      expenses[index] = normalizeExpense(Object.assign({}, current, updates, {
+        id: id,
+        createdBy: current.createdBy,
+        createdByName: current.createdByName,
+        createdAt: current.createdAt,
+        updatedBy: user.uid,
+        updatedByName: user.fullName,
+        updatedAt: isoNow()
+      }));
+      localStore.set('expenses', sortExpenses(expenses));
+      return expenses[index];
+    },
+
+    async updateExpensePaymentStatus(id, status) {
+      if (['pending', 'paid', 'settled'].indexOf(status) === -1) {
+        throw new Error('Invalid payment status.');
+      }
+      return this.updateExpense(id, { paymentStatus: status });
     },
 
     async deleteExpense(id) {
+      requireExpenseManager();
+      const db = getFirestoreDb();
+      if (db) {
+        await db.collection(EXPENSES_COLLECTION).doc(id).delete();
+        return true;
+      }
       let expenses = localStore.get('expenses');
-      expenses = expenses.filter(e => e.id !== id);
+      expenses = expenses.filter(function (item) { return item.id !== id; });
       localStore.set('expenses', expenses);
       return true;
+    },
+
+    async getExpenseCategories() {
+      const db = getFirestoreDb();
+      if (db) {
+        try {
+          const snapshot = await db.collection(SETTINGS_COLLECTION).doc('expenseCategories').get();
+          if (snapshot.exists) {
+            const categories = snapshot.data().categories;
+            if (Array.isArray(categories) && categories.length) {
+              return categories.filter(function (item) { return typeof item === 'string' && item.trim(); });
+            }
+          }
+        } catch (error) {
+          console.warn('Could not load expense categories from Firestore:', error);
+        }
+      }
+      return readLocalCategories();
+    },
+
+    async saveExpenseCategories(categories) {
+      requireExpenseManager();
+      const clean = Array.from(new Set((categories || []).map(function (item) {
+        return String(item || '').trim();
+      }).filter(Boolean)));
+      if (!clean.length) {
+        throw new Error('Please keep at least one expense category.');
+      }
+      const db = getFirestoreDb();
+      if (db) {
+        await db.collection(SETTINGS_COLLECTION).doc('expenseCategories').set({
+          categories: clean,
+          updatedBy: getAuthUser().uid,
+          updatedAt: isoNow()
+        }, { merge: true });
+      } else {
+        localStorage.setItem(EXPENSE_CATEGORIES_KEY, JSON.stringify(clean));
+      }
+      window.dispatchEvent(new CustomEvent('chronicles:expenseCategoriesUpdated', {
+        detail: { categories: clean }
+      }));
+      return clean;
     },
 
     // Photos / Hall of Fame API
@@ -855,3 +1024,4 @@
     }
   };
 })();
+

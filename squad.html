@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Squad — The 12 Chronicles</title>
   <meta name="description" content="Meet the 12 friends travelling to IIT Bombay Techfest and exploring Mumbai in December 2026." />
+  <link rel="icon" type="image/svg+xml" href="public/icons/icon.svg" />
+  <link rel="manifest" href="manifest.json" />
   
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -48,16 +50,40 @@
           </p>
         </div>
 
-        <div class="text-xs text-[#282824]/70 bg-white px-4 py-2.5 rounded-xl border border-[#A4A88A]/30 flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#354B3A]"></span>
-          <span>12 Members Verified & Ready</span>
+        <div class="flex items-center gap-2">
+          <a href="admin.html" id="admin-panel-link"
+             class="hidden px-4 py-2.5 rounded-xl bg-[#C76B4A] hover:bg-[#AB5636] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Admin Control Panel
+          </a>
+          <div class="text-xs text-[#282824]/70 bg-white px-4 py-2.5 rounded-xl border border-[#A4A88A]/30 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#354B3A]"></span>
+            <span id="squad-member-count">Loading members…</span>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Main Grid Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full space-y-8">
+    <div id="squad-role-notice" class="hidden"></div>
+
+    <!-- Admin Treasurer Approvals -->
+    <section id="admin-approvals" class="hidden journal-card p-6 bg-white border border-[#C76B4A]/30">
+      <div class="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-[#A4A88A]/20">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-wider text-[#C76B4A]">Admin Controls</span>
+          <h2 class="font-serif text-xl font-bold text-[#282824]">Treasurer Applications</h2>
+        </div>
+        <span id="pending-application-count" class="text-[11px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-[#C76B4A]/10 text-[#C76B4A]">0 pending</span>
+      </div>
+      <div id="admin-approvals-list" class="space-y-3"></div>
+    </section>
+
     <div id="squad-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <!-- Populated dynamically by squad.js -->
     </div>
@@ -65,37 +91,60 @@
 
   <!-- Edit Profile Modal -->
   <div id="edit-profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop animate-fade-in">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#A4A88A]/30">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#A4A88A]/30 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
         <h3 class="font-serif text-xl font-bold text-[#282824]">Update My Squad Profile</h3>
         <button id="cancel-edit-btn" class="text-gray-400 hover:text-[#282824]">✕</button>
       </div>
 
       <form id="edit-profile-form" class="space-y-4 text-xs">
+        <div class="flex items-center gap-4">
+          <img id="edit-photo-preview" alt="Profile photo preview"
+            class="w-16 h-16 rounded-full object-cover border border-[#A4A88A]/40 bg-[#F7F4EC]" />
+          <div class="flex-1">
+            <label for="edit-photo" class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Profile Photo</label>
+            <input id="edit-photo" type="file" accept="image/*"
+              class="block w-full text-[11px] text-[#282824]/70 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-[#354B3A] file:text-white file:text-[11px] file:font-semibold hover:file:bg-[#243428]" />
+            <p class="text-[10px] text-[#A4A88A] mt-1">JPG or PNG, under 8 MB.</p>
+          </div>
+        </div>
+
         <div>
-          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Squad Nickname *</label>
-          <input id="edit-nickname" required 
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Full Name *</label>
+          <input id="edit-fullname" required
                  class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]" />
         </div>
 
         <div>
-          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Designated Trip Role *</label>
-          <input id="edit-triprole" required 
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Email Address</label>
+          <input id="edit-email" disabled
+                 class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/30 bg-[#F7F4EC] text-xs text-[#282824]/60" />
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Squad Nickname</label>
+          <input id="edit-nickname" placeholder="e.g. The Navigator"
+                 class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]" />
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Designated Trip Role</label>
+          <input id="edit-triprole" placeholder="e.g. Logistics Lead"
                  class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]" />
         </div>
 
         <div>
           <label class="block font-semibold uppercase tracking-wider text-[#A4A88A] mb-1">Fun Fact / Signature Quote</label>
-          <textarea id="edit-funfact" rows="3" required
+          <textarea id="edit-funfact" rows="3" placeholder="Something the squad should know…"
                     class="w-full px-3 py-2 rounded-lg border border-[#A4A88A]/40 text-xs focus:outline-none focus:border-[#354B3A]"></textarea>
         </div>
 
         <div class="flex gap-2 pt-2">
-          <button type="button" onclick="document.getElementById('edit-profile-modal').classList.add('hidden')" 
+          <button type="button" onclick="document.getElementById('edit-profile-modal').classList.add('hidden')"
                   class="flex-1 py-2.5 rounded-lg border border-[#A4A88A]/40 font-semibold text-[#282824] hover:bg-gray-50">
             Cancel
           </button>
-          <button type="submit" 
+          <button type="submit" id="save-profile-btn"
                   class="flex-1 py-2.5 rounded-lg bg-[#354B3A] hover:bg-[#243428] text-white font-semibold transition-colors">
             Save Changes
           </button>
@@ -108,17 +157,19 @@
   <footer class="mt-20 border-t border-[#A4A88A]/30 bg-white/60">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between text-xs text-[#282824]/70">
       <span>The 12 Chronicles • Mumbai 2026</span>
-      <button onclick="window.openFirebaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
-        🔥 Firebase Status: Sync Ready
+      <button onclick="window.openSupabaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
+        ⚡ Supabase Status: Sync Ready
       </button>
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="js/firebase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/firebase.js"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/main.js"></script>
   <script src="js/squad.js"></script>
 </body>
 </html>
+

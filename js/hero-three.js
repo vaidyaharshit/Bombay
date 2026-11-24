@@ -326,3 +326,4 @@
     renderer.setSize(container.clientWidth, container.clientHeight);
   });
 })();
+

@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The 12 Chronicles — IIT Bombay Techfest × Mumbai 2026</title>
-  <meta name="description" content="A private travel journal and collaborative trip management platform for 12 friends exploring Mumbai and IIT Bombay Techfest in December 2026." />
-  
+  <meta name="description"
+    content="A private travel journal and collaborative trip management platform for 12 friends exploring Mumbai and IIT Bombay Techfest in December 2026." />
+  <link rel="icon" type="image/svg+xml" href="public/icons/icon.svg" />
+  <link rel="manifest" href="manifest.json" />
+
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -30,29 +34,44 @@
 
   <!-- Google Fonts & Custom CSS -->
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="preload" as="image" href="public/images/mumbai-hero-poster.jpg" />
 
-  <!-- Three.js CDN for lightweight 3D Mumbai Hero -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Hero video background is pure HTML5 — no Three.js needed -->
 </head>
+
 <body class="bg-[#F7F4EC] text-[#282824] paper-texture flex flex-col min-h-screen">
 
   <!-- Shared Global Navigation -->
   <div id="global-nav"></div>
 
-  <!-- Hero Section with Minimalist 3D Visualization -->
-  <section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden border-b border-[#A4A88A]/30">
-    <!-- Three.js 3D Canvas Background -->
-    <div id="hero-canvas-container" class="absolute inset-0"></div>
+  <!-- Dashboard Hero with Full-Screen Cinematic Mumbai Video Background -->
+  <section id="dashboard-hero"
+    class="dashboard-hero relative flex items-center justify-center overflow-hidden border-b border-[#A4A88A]/30">
+    <!-- Cinematic Video Background -->
+    <div class="hero-media absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
+      <!-- Poster fallback shown until video loads -->
+      <img src="public/images/mumbai-hero-poster.jpg" alt="" aria-hidden="true" id="hero-poster-fallback"
+        class="hero-poster absolute inset-0 w-full h-full object-cover select-none" />
 
-    <!-- Gentle gradient overlay for high text legibility -->
-    <div class="absolute inset-0 bg-gradient-to-b from-[#F7F4EC]/60 via-[#F7F4EC]/40 to-[#F7F4EC] pointer-events-none z-10"></div>
+      <!-- Mumbai cinematic video — autoplays muted & loops -->
+      <video id="hero-video"
+        class="hero-video absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-[1500ms] ease-in-out"
+        autoplay muted loop playsinline webkit-playsinline preload="metadata"
+        poster="public/images/mumbai-hero-poster.jpg" tabindex="-1" disablepictureinpicture>
+        <source src="public/videos/mumbai-real-footage.mp4" type="video/mp4" />
+      </video>
+    </div>
+
+    <!-- Warm ivory / charcoal cinematic overlay for text legibility -->
+    <div class="hero-overlay absolute inset-0 z-10 pointer-events-none"></div>
 
     <!-- Hero Content -->
     <div class="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-      <!-- 12 Members Pill & Dates -->
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-[#A4A88A]/40 shadow-sm backdrop-blur-sm mb-6 animate-fade-in">
+      <!-- Member Pill & Dates -->
+      <div
+        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-[#A4A88A]/40 shadow-sm backdrop-blur-sm mb-6 animate-fade-in">
         <span class="w-2 h-2 rounded-full bg-[#354B3A] animate-pulse"></span>
-        <span class="text-xs font-semibold uppercase tracking-wider text-[#354B3A]">12 Friends Active</span>
+        <span id="hero-member-pill" class="text-xs font-semibold uppercase tracking-wider text-[#354B3A]">Private Member Circle</span>
         <span class="text-[#A4A88A]">•</span>
         <span class="text-xs font-medium text-[#282824]">Dec 24 – 29, 2026</span>
       </div>
@@ -69,227 +88,215 @@
       </p>
 
       <!-- Live Countdown Timer to Dec 25, 2026 Techfest -->
-      <div class="max-w-xl mx-auto mb-10 bg-white/95 backdrop-blur-md rounded-2xl p-6 border border-[#A4A88A]/30 shadow-md">
-        <div class="flex items-center justify-center gap-1.5 mb-3 text-xs uppercase tracking-widest font-bold text-[#A4A88A]">
+      <div
+        class="max-w-xl mx-auto mb-10 bg-white/95 backdrop-blur-md rounded-2xl p-6 border border-[#A4A88A]/30 shadow-md">
+        <div
+          class="flex items-center justify-center gap-1.5 mb-3 text-xs uppercase tracking-widest font-bold text-[#A4A88A]">
           <span>Countdown to IIT Bombay Techfest 2026</span>
         </div>
         <div class="grid grid-cols-4 gap-3 sm:gap-6 text-center">
           <div class="p-3 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20">
             <span id="countdown-days" class="font-serif text-2xl sm:text-4xl font-bold text-[#354B3A] block">--</span>
-            <span class="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-[#A4A88A] mt-1 block">Days</span>
+            <span
+              class="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-[#A4A88A] mt-1 block">Days</span>
           </div>
           <div class="p-3 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20">
             <span id="countdown-hours" class="font-serif text-2xl sm:text-4xl font-bold text-[#354B3A] block">--</span>
-            <span class="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-[#A4A88A] mt-1 block">Hours</span>
+            <span
+              class="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-[#A4A88A] mt-1 block">Hours</span>
           </div>
           <div class="p-3 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20">
-            <span id="countdown-minutes" class="font-serif text-2xl sm:text-4xl font-bold text-[#354B3A] block">--</span>
-            <span class="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-[#A4A88A] mt-1 block">Minutes</span>
+            <span id="countdown-minutes"
+              class="font-serif text-2xl sm:text-4xl font-bold text-[#354B3A] block">--</span>
+            <span
+              class="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-[#A4A88A] mt-1 block">Minutes</span>
           </div>
           <div class="p-3 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20">
-            <span id="countdown-seconds" class="font-serif text-2xl sm:text-4xl font-bold text-[#C76B4A] block">--</span>
-            <span class="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-[#A4A88A] mt-1 block">Seconds</span>
+            <span id="countdown-seconds"
+              class="font-serif text-2xl sm:text-4xl font-bold text-[#C76B4A] block">--</span>
+            <span
+              class="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-[#A4A88A] mt-1 block">Seconds</span>
           </div>
         </div>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex flex-wrap items-center justify-center gap-4">
-        <a href="schedule.html" 
-           class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
-          <span>Explore Itinerary</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+      <div id="hero-actions" class="flex flex-wrap items-center justify-center gap-4">
+        <a href="auth.html?mode=login"
+          class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+          <span>Member Log In</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
         </a>
-        <a href="hall-of-fame.html" 
-           class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm">
-          <span>Hall of Fame Photos</span>
+        <a href="auth.html?mode=signup"
+          class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm flex items-center gap-2">
+          <span>Join with Invite</span>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Below Hero: Trip Highlights, Next Activity, Announcements & Poll -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1 space-y-16">
+  <!-- Below Hero: Public membership entry + private member dashboard -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1 w-full">
 
-    <!-- Upcoming Activity Highlight Banner -->
-    <div id="upcoming-banner"></div>
-
-    <!-- Trip Overview & Quick Stats -->
-    <section>
+    <!-- Public Membership Section -->
+    <section id="membership-section" class="max-w-4xl mx-auto">
       <div class="text-center max-w-2xl mx-auto mb-10">
-        <span class="text-xs uppercase tracking-widest font-bold text-[#C76B4A]">Trip Architecture</span>
-        <h2 class="font-serif text-3xl font-bold text-[#282824] mt-1">Our Mumbai Chapter</h2>
-        <p class="text-xs sm:text-sm text-[#282824]/70 mt-2">
-          A seamless blend of Asia's largest science & technology festival at IIT Bombay, heritage walks, coastal drives, and street food runs.
+        <span class="text-xs uppercase tracking-widest font-bold text-[#C76B4A]">Private Membership</span>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-[#282824] mt-1">A journal kept by the twelve</h2>
+        <p class="text-xs sm:text-sm text-[#282824]/70 mt-3 leading-relaxed">
+          The itinerary, live expense ledger, squad directory and shared memories are private to verified members.
+          Log in with your member account or join using the group invitation code.
         </p>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-        <div class="journal-card p-6 text-center bg-white">
-          <span class="font-serif text-3xl sm:text-4xl font-bold text-[#354B3A] block">6</span>
-          <span class="text-xs uppercase tracking-wider font-bold text-[#A4A88A] mt-1 block">Full Days</span>
-          <span class="text-[11px] text-[#282824]/70 mt-1 block">Dec 24 – Dec 29</span>
-        </div>
-        <div class="journal-card p-6 text-center bg-white">
-          <span class="font-serif text-3xl sm:text-4xl font-bold text-[#C76B4A] block">12</span>
-          <span class="text-xs uppercase tracking-wider font-bold text-[#A4A88A] mt-1 block">Squad Members</span>
-          <span class="text-[11px] text-[#282824]/70 mt-1 block">100% United</span>
-        </div>
-        <div class="journal-card p-6 text-center bg-white">
-          <span class="font-serif text-3xl sm:text-4xl font-bold text-[#354B3A] block">8+</span>
-          <span class="text-xs uppercase tracking-wider font-bold text-[#A4A88A] mt-1 block">Iconic Sights</span>
-          <span class="text-[11px] text-[#282824]/70 mt-1 block">From IIT to Marine Drive</span>
-        </div>
-        <div class="journal-card p-6 text-center bg-white">
-          <span class="font-serif text-3xl sm:text-4xl font-bold text-[#C76B4A] block">₹0</span>
-          <span class="text-xs uppercase tracking-wider font-bold text-[#A4A88A] mt-1 block">Split Confusion</span>
-          <span class="text-[11px] text-[#282824]/70 mt-1 block">Equal Smart Ledger</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Two-column grid: Announcements & Active Poll -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      
-      <!-- Important Announcements -->
-      <div class="journal-card p-6 bg-white border border-[#A4A88A]/30 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2">
-              <span class="text-lg">📢</span>
-              <h3 class="font-serif text-xl font-bold text-[#282824]">Important Trip Updates</h3>
-            </div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-[#354B3A] bg-[#354B3A]/10 px-2 py-0.5 rounded">
-              Verified
-            </span>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="journal-card p-6 sm:p-7 bg-white flex flex-col">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-[#354B3A]/10 text-[#354B3A] flex items-center justify-center text-lg">🔐</div>
+            <h3 class="font-serif text-xl font-bold text-[#282824]">Already a member?</h3>
           </div>
-
-          <div id="home-announcements-list" class="space-y-3">
-            <div class="p-3.5 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-xs font-bold text-[#282824]">Train Departure Platform Confirmed</span>
-                <span class="text-[10px] text-[#C76B4A] font-bold">URGENT</span>
-              </div>
-              <p class="text-xs text-[#282824]/80 leading-relaxed">
-                Mumbai Rajdhani Express departs at 04:55 PM from New Delhi (NDLS). All 12 members to gather at Gate 3 by 04:00 PM with luggage.
-              </p>
-              <span class="text-[10px] text-[#A4A88A] block mt-1.5">— Aryan Sharma (Trip Lead)</span>
-            </div>
-
-            <div class="p-3.5 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-xs font-bold text-[#282824]">Techfest Official Entry Passes Issued</span>
-                <span class="text-[10px] text-[#354B3A] font-bold">NOTICE</span>
-              </div>
-              <p class="text-xs text-[#282824]/80 leading-relaxed">
-                QR passes and student credentials have been confirmed for the team robotics showcase and keynotes.
-              </p>
-              <span class="text-[10px] text-[#A4A88A] block mt-1.5">— Tanvi Deshmukh</span>
-            </div>
-          </div>
+          <p class="text-xs text-[#282824]/70 leading-relaxed flex-1">
+            Sign in with the email and password you registered with. Your role and permissions are loaded automatically.
+          </p>
+          <a href="auth.html?mode=login"
+            class="mt-5 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold transition-colors">
+            <span>Log In</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </a>
         </div>
 
-        <div class="pt-4 mt-4 border-t border-[#A4A88A]/20 flex items-center justify-between">
-          <a href="planner.html" class="text-xs font-semibold text-[#354B3A] hover:underline flex items-center gap-1">
-            <span>View Full Preparation Checklist</span>
-            <span>➔</span>
+        <div class="journal-card p-6 sm:p-7 bg-white flex flex-col">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-[#C76B4A]/10 text-[#C76B4A] flex items-center justify-center text-lg">🪪</div>
+            <h3 class="font-serif text-xl font-bold text-[#282824]">New to the squad?</h3>
+          </div>
+          <p class="text-xs text-[#282824]/70 leading-relaxed flex-1">
+            Create your member account with the private invitation code. Treasurer access requires Admin approval after registration.
+          </p>
+          <a href="auth.html?mode=signup"
+            class="mt-5 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white border border-[#354B3A]/40 hover:bg-[#F7F4EC] text-[#354B3A] text-sm font-semibold transition-colors">
+            <span>Join with Invite</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
           </a>
         </div>
       </div>
 
-      <!-- Quick Group Poll Teaser -->
-      <div class="journal-card p-6 bg-white border border-[#A4A88A]/30 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2">
-              <span class="text-lg">🗳️</span>
-              <h3 class="font-serif text-xl font-bold text-[#282824]">Active Group Decision</h3>
-            </div>
-            <span class="text-[11px] font-bold uppercase tracking-wider text-[#C76B4A] bg-[#C76B4A]/10 px-2 py-0.5 rounded">
-              Vote Open
-            </span>
-          </div>
-
-          <div id="home-poll-container">
-            <p class="text-xs font-semibold text-[#282824] mb-3">Where should we have our Day 1 celebration dinner?</p>
-            <div class="space-y-2 text-xs">
-              <div class="p-3 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20 flex items-center justify-between">
-                <span>Bade Miya / Cafe Mondegar (Colaba)</span>
-                <span class="font-bold text-[#354B3A]">4 Votes (33%)</span>
-              </div>
-              <div class="p-3 bg-[#354B3A]/10 rounded-xl border border-[#354B3A]/30 flex items-center justify-between">
-                <span class="font-semibold text-[#354B3A]">Sardar Pav Bhaji (Tardeo)</span>
-                <span class="font-bold text-[#354B3A]">5 Votes (42%)</span>
-              </div>
-              <div class="p-3 bg-[#F7F4EC] rounded-xl border border-[#A4A88A]/20 flex items-center justify-between">
-                <span>Britannia & Co. Berry Pulao (Ballard Estate)</span>
-                <span class="font-bold text-[#354B3A]">3 Votes (25%)</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="pt-4 mt-4 border-t border-[#A4A88A]/20 flex items-center justify-between">
-          <a href="planner.html" class="text-xs font-semibold text-[#354B3A] hover:underline flex items-center gap-1">
-            <span>Cast or Change Vote in Planner</span>
-            <span>➔</span>
-          </a>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Hall of Fame Quick Preview -->
-    <section>
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <span class="text-xs uppercase tracking-widest font-bold text-[#C76B4A]">Shared Lens</span>
-          <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#282824]">Hall of Fame Preview</h2>
-        </div>
-        <a href="hall-of-fame.html" class="text-xs font-semibold text-[#354B3A] hover:underline flex items-center gap-1">
-          <span>View All Photos</span>
-          <span>➔</span>
+      <!-- Discreet Trip Owner Link -->
+      <div id="homepage-admin-entry" class="mt-4 text-center">
+        <a href="auth.html?mode=admin-setup"
+          class="inline-flex items-center gap-1.5 text-xs text-[#C76B4A] hover:text-[#9e4a2d] font-semibold px-3 py-1.5 rounded-lg hover:bg-[#C76B4A]/10 transition-colors">
+          <span>👑</span>
+          <span>Trip Owner? Set Up Admin Account</span>
         </a>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="journal-card overflow-hidden group bg-white">
-          <div class="h-56 overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=800&q=80" 
-                 alt="CSMT Sunrise" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-          </div>
-          <div class="p-4">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-[#C76B4A]">Day 1 • Highlights</span>
-            <h4 class="font-serif font-bold text-sm text-[#282824] mt-0.5">CSMT Gothic Arches at Sunrise</h4>
-            <p class="text-xs text-[#282824]/70 mt-1 line-clamp-2">Stepping onto the historic station platform with the morning light hitting the stained glass.</p>
-          </div>
-        </div>
+      <div id="membership-mode-note"
+        class="mt-6 p-4 rounded-xl bg-white border border-[#A4A88A]/30 text-[11px] text-[#282824]/70 text-center leading-relaxed">
+        Checking connection mode…
+      </div>
 
-        <div class="journal-card overflow-hidden group bg-white">
-          <div class="h-56 overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=800&q=80" 
-                 alt="Marine Drive" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-          </div>
-          <div class="p-4">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-[#354B3A]">Day 1 • Marine Drive</span>
-            <h4 class="font-serif font-bold text-sm text-[#282824] mt-0.5">Sunset over Queen's Necklace</h4>
-            <p class="text-xs text-[#282824]/70 mt-1 line-clamp-2">Sitting on the tetrapods waiting for the sodium vapor lamps to turn on along the curve.</p>
-          </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+        <div class="p-4 bg-white rounded-xl border border-[#A4A88A]/25">
+          <p class="text-xs font-bold text-[#282824]">Member</p>
+          <p class="text-[11px] text-[#282824]/65 mt-1">View the schedule, squad, planner and shared memories.</p>
         </div>
-
-        <div class="journal-card overflow-hidden group bg-white sm:col-span-2 lg:col-span-1">
-          <div class="h-56 overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=800&q=80" 
-                 alt="IIT Bombay" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-          </div>
-          <div class="p-4">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-[#354B3A]">Day 2 • Techfest</span>
-            <h4 class="font-serif font-bold text-sm text-[#282824] mt-0.5">Techfest Main Gate Entrance</h4>
-            <p class="text-xs text-[#282824]/70 mt-1 line-clamp-2">Inside IIT Bombay campus! The sheer energy and scale of installations is breathtaking.</p>
-          </div>
+        <div class="p-4 bg-white rounded-xl border border-[#A4A88A]/25">
+          <p class="text-xs font-bold text-[#282824]">Treasurer</p>
+          <p class="text-[11px] text-[#282824]/65 mt-1">Approved by an Admin, can manage the shared expense ledger.</p>
+        </div>
+        <div class="p-4 bg-white rounded-xl border border-[#A4A88A]/25">
+          <p class="text-xs font-bold text-[#282824]">Admin</p>
+          <p class="text-[11px] text-[#282824]/65 mt-1">Reviews Treasurer requests and has full ledger access.</p>
         </div>
       </div>
     </section>
+
+    <!-- Private Member Dashboard -->
+    <div id="member-dashboard" class="hidden space-y-16">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div>
+          <span class="text-xs uppercase tracking-widest font-bold text-[#C76B4A]">Member Dashboard</span>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#282824] mt-1">
+            Welcome, <span id="member-welcome">friend</span>
+          </h2>
+        </div>
+        <a href="auth.html" id="member-profile-link" class="text-xs font-semibold text-[#354B3A] hover:underline">View my account</a>
+      </div>
+
+      <div id="upcoming-banner"></div>
+
+      <section>
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <span class="text-xs uppercase tracking-widest font-bold text-[#C76B4A]">Private Access</span>
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#282824]">Your trip command center</h2>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <a href="schedule.html" class="journal-card p-5 bg-white flex items-start gap-4">
+            <span class="text-2xl">🗓️</span>
+            <span>
+              <span class="block font-serif text-base font-bold text-[#282824]">Master Schedule</span>
+              <span class="block text-xs text-[#282824]/65 mt-1">Day-by-day timeline, locations and live status.</span>
+            </span>
+          </a>
+          <a href="expenses.html" class="journal-card p-5 bg-white flex items-start gap-4">
+            <span class="text-2xl">🧾</span>
+            <span>
+              <span class="block font-serif text-base font-bold text-[#282824]">Expense Ledger</span>
+              <span class="block text-xs text-[#282824]/65 mt-1">Shared spending, balances and simplified settlements.</span>
+            </span>
+          </a>
+          <a href="squad.html" class="journal-card p-5 bg-white flex items-start gap-4">
+            <span class="text-2xl">👥</span>
+            <span>
+              <span class="block font-serif text-base font-bold text-[#282824]">Squad Directory</span>
+              <span class="block text-xs text-[#282824]/65 mt-1">Real registered members and trip responsibilities.</span>
+            </span>
+          </a>
+          <a href="planner.html" class="journal-card p-5 bg-white flex items-start gap-4">
+            <span class="text-2xl">🗳️</span>
+            <span>
+              <span class="block font-serif text-base font-bold text-[#282824]">Planner &amp; Polls</span>
+              <span class="block text-xs text-[#282824]/65 mt-1">Checklists, group decisions and packing prep.</span>
+            </span>
+          </a>
+          <a href="explore.html" class="journal-card p-5 bg-white flex items-start gap-4">
+            <span class="text-2xl">🧭</span>
+            <span>
+              <span class="block font-serif text-base font-bold text-[#282824]">Mumbai Explorer</span>
+              <span class="block text-xs text-[#282824]/65 mt-1">Discover and save places around Mumbai.</span>
+            </span>
+          </a>
+          <a href="hall-of-fame.html" class="journal-card p-5 bg-white flex items-start gap-4">
+            <span class="text-2xl">📸</span>
+            <span>
+              <span class="block font-serif text-base font-bold text-[#282824]">Hall of Fame</span>
+              <span class="block text-xs text-[#282824]/65 mt-1">The shared lens and the best trip photographs.</span>
+            </span>
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <span class="text-xs uppercase tracking-widest font-bold text-[#C76B4A]">Shared Lens</span>
+            <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#282824]">Hall of Fame Preview</h2>
+          </div>
+          <a href="hall-of-fame.html" class="text-xs font-semibold text-[#354B3A] hover:underline flex items-center gap-1">
+            <span>View All Photos</span>
+            <span>➔</span>
+          </a>
+        </div>
+
+        <div id="home-photos-preview" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Populated dynamically from Hall of Fame store -->
+        </div>
+      </section>
+    </div>
 
   </main>
 
@@ -299,7 +306,8 @@
       <div class="flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
           <span class="font-serif text-xl font-bold text-[#282824]">The 12 Chronicles</span>
-          <p class="text-xs text-[#282824]/60 mt-1">Private collaborative travel journal for 12 friends • IIT Bombay Techfest & Mumbai 2026</p>
+          <p class="text-xs text-[#282824]/60 mt-1">Private collaborative travel journal for 12 friends • IIT Bombay
+            Techfest & Mumbai 2026</p>
         </div>
         <div class="flex flex-wrap items-center gap-5 text-xs text-[#282824]/80">
           <a href="schedule.html" class="hover:text-[#354B3A]">Schedule</a>
@@ -309,12 +317,13 @@
           <a href="squad.html" class="hover:text-[#354B3A]">Squad</a>
           <a href="expenses.html" class="hover:text-[#354B3A]">Expenses</a>
           <a href="memories.html" class="hover:text-[#354B3A]">Wrapped</a>
-          <button onclick="window.openFirebaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline">
-            🔥 Firebase Sync
+          <button onclick="window.openSupabaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline">
+            ⚡ Supabase Sync
           </button>
         </div>
       </div>
-      <div class="border-t border-[#A4A88A]/20 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#A4A88A]">
+      <div
+        class="border-t border-[#A4A88A]/20 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#A4A88A]">
         <p>© 2026 The 12 Chronicles. Built for the adventure of a lifetime.</p>
         <p>Warm Ivory • Forest Green • Terracotta • Muted Olive</p>
       </div>
@@ -322,47 +331,217 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="js/firebase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/firebase.js"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/main.js"></script>
-  <script src="js/hero-three.js"></script>
+  <script>
+      (function () {
+        const video = document.getElementById('hero-video');
+        const poster = document.getElementById('hero-poster-fallback');
+        if (!video) return;
+
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+        function playVideo() {
+          if (reducedMotion.matches) return;
+          const attempt = video.play();
+          if (attempt && typeof attempt.catch === 'function') {
+            attempt.catch(function () { });
+          }
+        }
+
+        function showPoster() {
+          if (poster) poster.style.display = '';
+          video.classList.remove('opacity-100');
+          video.classList.add('opacity-0');
+        }
+
+        function revealVideo() {
+          if (reducedMotion.matches) return;
+          video.classList.remove('opacity-0');
+          video.classList.add('opacity-100');
+          window.setTimeout(function () {
+            if (poster && !reducedMotion.matches) poster.style.display = 'none';
+          }, 1600);
+        }
+
+        function handleMotionChange(event) {
+          if (event.matches) {
+            video.pause();
+            showPoster();
+          } else {
+            revealVideo();
+            playVideo();
+          }
+        }
+
+        if (typeof reducedMotion.addEventListener === 'function') {
+          reducedMotion.addEventListener('change', handleMotionChange);
+        } else if (typeof reducedMotion.addListener === 'function') {
+          reducedMotion.addListener(handleMotionChange);
+        }
+
+        if (reducedMotion.matches) {
+          video.pause();
+          video.removeAttribute('autoplay');
+          showPoster();
+          return;
+        }
+
+        video.muted = true;
+        video.playsInline = true;
+
+        if (video.readyState >= 3) {
+          revealVideo();
+        } else {
+          video.addEventListener('canplay', revealVideo, { once: true });
+        }
+
+        playVideo();
+
+        video.addEventListener('error', showPoster);
+
+        if ('IntersectionObserver' in window) {
+          const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                playVideo();
+              } else {
+                video.pause();
+              }
+            });
+          }, { threshold: 0.08 });
+          observer.observe(video);
+        }
+      })();
+  </script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // Load upcoming activity highlight
-      const schedule = await window.chroniclesData.getSchedule();
-      const upcomingBanner = document.getElementById('upcoming-banner');
-      if (upcomingBanner && schedule.length > 0) {
-        const item = schedule.find(i => i.status !== 'Completed') || schedule[0];
-        upcomingBanner.innerHTML = `
-          <div class="bg-[#354B3A] text-white p-6 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="flex items-start sm:items-center gap-4">
-              <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-xl flex-shrink-0">
-                🧭
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[11px] uppercase tracking-wider font-bold text-[#F7F4EC]/80">Next Activity on Master Schedule</span>
-                  <span class="text-[10px] px-2 py-0.2 bg-[#C76B4A] text-white rounded-full font-bold">Day ${item.day} • ${item.time}</span>
-                </div>
-                <h3 class="font-serif text-xl font-bold text-white mt-0.5">${item.title}</h3>
-                <p class="text-xs text-white/80 line-clamp-1">${item.location}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <a href="${item.mapUrl}" target="_blank" rel="noopener noreferrer" 
-                 class="px-4 py-2.5 bg-white text-[#354B3A] rounded-xl text-xs font-bold hover:bg-[#F7F4EC] transition-colors flex items-center gap-1.5 shadow-sm">
-                <span>Directions</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-              </a>
-              <a href="schedule.html" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors">
-                View Timeline
-              </a>
-            </div>
-          </div>
-        `;
+      const auth = window.authService;
+      if (auth) {
+        await auth.ready;
       }
+
+      async function refreshHome() {
+        const user = auth ? auth.getCurrentUser() : null;
+        const membership = document.getElementById('membership-section');
+        const dashboard = document.getElementById('member-dashboard');
+        const modeNote = document.getElementById('membership-mode-note');
+        const heroPill = document.getElementById('hero-member-pill');
+        const heroActions = document.getElementById('hero-actions');
+
+        if (membership) membership.classList.toggle('hidden', !!user);
+        if (dashboard) dashboard.classList.toggle('hidden', !user);
+
+        if (heroPill) {
+          const count = auth ? auth.getAllMembers().length : 0;
+          heroPill.textContent = user
+            ? count + ' Members Registered'
+            : 'Private Member Circle';
+        }
+
+        if (heroActions) {
+          heroActions.innerHTML = user
+            ? `
+              <a href="schedule.html" class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                <span>Explore Itinerary</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </a>
+              <a href="hall-of-fame.html" class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm">
+                <span>Hall of Fame Photos</span>
+              </a>
+            `
+            : `
+              <a href="auth.html?mode=login" class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                <span>Member Log In</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </a>
+              <a href="auth.html?mode=signup" class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm">
+                <span>Create Member Account</span>
+              </a>
+            `;
+        }
+
+        if (modeNote) {
+          const mode = auth ? auth.mode : 'unconfigured';
+          modeNote.textContent = mode === 'supabase'
+            ? 'Connected to Supabase Authentication and PostgreSQL. Member accounts, roles and expenses sync across devices in real time.'
+            : 'Supabase is not configured yet. Add your Project URL and Anon Key via the footer settings to connect.';
+        }
+
+        if (!user) return;
+
+        const welcome = document.getElementById('member-welcome');
+        if (welcome) welcome.textContent = user.nickname || user.fullName;
+
+        const profileLink = document.getElementById('member-profile-link');
+        if (profileLink) profileLink.href = 'squad.html';
+
+        const schedule = await window.chroniclesData.getSchedule();
+        const upcomingBanner = document.getElementById('upcoming-banner');
+        if (upcomingBanner && schedule.length > 0) {
+          const item = schedule.find(i => i.status !== 'Completed') || schedule[0];
+          upcomingBanner.innerHTML = `
+            <div class="bg-[#354B3A] text-white p-6 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex items-start sm:items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-xl flex-shrink-0">
+                  🧭
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[11px] uppercase tracking-wider font-bold text-[#F7F4EC]/80">Next Activity on Master Schedule</span>
+                    <span class="text-[10px] px-2 py-0.5 bg-[#C76B4A] text-white rounded-full font-bold">Day ${item.day} • ${item.time}</span>
+                  </div>
+                  <h3 class="font-serif text-xl font-bold text-white mt-0.5">${item.title}</h3>
+                  <p class="text-xs text-white/80 line-clamp-1">${item.location}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <a href="${item.mapUrl}" target="_blank" rel="noopener noreferrer"
+                   class="px-4 py-2.5 bg-white text-[#354B3A] rounded-xl text-xs font-bold hover:bg-[#F7F4EC] transition-colors flex items-center gap-1.5 shadow-sm">
+                  <span>Directions</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+                <a href="schedule.html" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors">
+                  View Timeline
+                </a>
+              </div>
+            </div>
+          `;
+        }
+
+        const preview = document.getElementById('home-photos-preview');
+        if (preview) {
+          const photos = await window.chroniclesData.getPhotos();
+          const featured = (photos || []).slice(0, 3);
+          preview.innerHTML = featured.length
+            ? featured.map(photo => `
+                <a href="hall-of-fame.html" class="journal-card overflow-hidden bg-white group">
+                  <div class="h-48 overflow-hidden bg-[#F7F4EC]">
+                    <img src="${photo.url}" alt="${photo.title || 'Trip photo'}" loading="lazy"
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  </div>
+                  <div class="p-4">
+                    <p class="text-[10px] uppercase tracking-wider font-bold text-[#A4A88A]">${photo.album || 'Memories'}</p>
+                    <h3 class="font-serif text-sm font-bold text-[#282824] mt-1">${photo.title || 'Untitled memory'}</h3>
+                  </div>
+                </a>
+              `).join('')
+            : `
+              <div class="sm:col-span-2 lg:col-span-3 text-center py-10 bg-white rounded-xl border border-[#A4A88A]/30">
+                <p class="font-serif text-base font-bold text-[#282824]">No photos shared yet</p>
+                <p class="text-xs text-[#282824]/60 mt-1">Add the first memory in the Hall of Fame.</p>
+              </div>
+            `;
+        }
+      }
+
+      await refreshHome();
+      window.addEventListener('chronicles:authChanged', refreshHome);
     });
   </script>
 </body>
+
 </html>

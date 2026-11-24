@@ -306,7 +306,10 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (window.authService) {
+      await window.authService.ready;
+    }
     initTabs();
     initForm();
     loadSchedule();
@@ -315,8 +318,13 @@
       renderSchedule();
     });
 
+    window.addEventListener('chronicles:membersChanged', () => {
+      renderSchedule();
+    });
+
     window.addEventListener('chronicles:scheduleUpdated', () => {
       loadSchedule();
     });
   });
 })();
+

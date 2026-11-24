@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trip Planner & Logistics — The 12 Chronicles</title>
   <meta name="description" content="Collaborative trip planning, room allocation, travel preparation checklists, and group polls for 12 friends." />
+  <link rel="icon" type="image/svg+xml" href="public/icons/icon.svg" />
+  <link rel="manifest" href="manifest.json" />
   
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -360,17 +362,19 @@
   <footer class="mt-20 border-t border-[#A4A88A]/30 bg-white/60">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between text-xs text-[#282824]/70">
       <span>The 12 Chronicles • Mumbai 2026</span>
-      <button onclick="window.openFirebaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
-        🔥 Firebase Status: Sync Ready
+      <button onclick="window.openSupabaseSettingsModal()" class="text-[#354B3A] font-semibold hover:underline mt-2 sm:mt-0">
+        ⚡ Supabase Status: Sync Ready
       </button>
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="js/firebase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/firebase.js"></script>
+  <script src="js/supabase.js"></script>
   <script src="js/main.js"></script>
   <script src="js/planner.js"></script>
 </body>
 </html>
+

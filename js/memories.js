@@ -125,8 +125,16 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (window.authService) {
+      await window.authService.ready;
+    }
     initForm();
     loadMemories();
+
+    window.addEventListener('chronicles:membersChanged', () => {
+      loadMemories();
+    });
   });
 })();
+

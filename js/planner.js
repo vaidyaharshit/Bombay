@@ -407,7 +407,10 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (window.authService) {
+      await window.authService.ready;
+    }
     initTabs();
     initModals();
     initPlanner();
@@ -418,5 +421,12 @@
     window.addEventListener('chronicles:pollsUpdated', () => {
       initPlanner();
     });
+    window.addEventListener('chronicles:membersChanged', () => {
+      initPlanner();
+    });
+    window.addEventListener('chronicles:authChanged', () => {
+      initPlanner();
+    });
   });
 })();
+

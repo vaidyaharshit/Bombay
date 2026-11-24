@@ -1,0 +1,18 @@
+{
+  "name": "The 12 Chronicles — Mumbai 2026",
+  "short_name": "12 Chronicles",
+  "description": "Private collaborative travel journal for 12 friends exploring Mumbai & IIT Bombay Techfest 2026",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F7F4EC",
+  "theme_color": "#354B3A",
+  "icons": [
+    {
+      "src": "./public/icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

@@ -11,6 +11,20 @@ const DEFAULT_FIREBASE_CONFIG = {
   appId: "1:123456789012:web:abcdef1234567890"
 };
 
+// Group-wide settings.
+// Admin access is granted only through the Firebase custom claim `admin: true`
+// by the one-time functions/scripts/set-admin-claim.js setup script.
+const GROUP_CONFIG = {
+  functionsRegion: "us-central1",
+  collections: {
+    users: "users",
+    expenses: "expenses",
+    invites: "groupInvites",
+    settings: "settings",
+    explore: "exploreDestinations"
+  }
+};
+
 // Allow runtime override via localStorage for quick testing without file edits
 function getActiveFirebaseConfig() {
   try {
@@ -25,7 +39,8 @@ function getActiveFirebaseConfig() {
 }
 
 window.firebaseConfig = getActiveFirebaseConfig();
-window.isFirebaseConfigured = function() {
+window.GROUP_CONFIG = GROUP_CONFIG;
+window.isFirebaseConfigured = function () {
   const cfg = window.firebaseConfig;
-  return cfg && cfg.apiKey && !cfg.apiKey.includes('PLACEHOLDER');
+  return !!(cfg && cfg.apiKey && !String(cfg.apiKey).includes('PLACEHOLDER') && cfg.projectId);
 };

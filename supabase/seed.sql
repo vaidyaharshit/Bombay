@@ -1,0 +1,3 @@
+-- Seed file intentionally cleared.
+-- The user requested no demo or fake data in their Supabase database.
+-- Real user data only.
