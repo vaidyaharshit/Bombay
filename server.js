@@ -137,6 +137,28 @@ function handleRequest(req, res) {
       'Accept-Ranges': 'bytes'
     };
 
+    // For HTML files, inject Vercel / local environment variables dynamically into <head>
+    if (ext === '.html') {
+      let content = fs.readFileSync(resolvedPath, 'utf8');
+      const supabaseUrl = process.env.SUPABASE_URL || "https://taadgybxbhgsschluqla.supabase.co";
+      const supabaseKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || "sb_publishable_JI0xqclzW7eTAXXnKZ5raQ_LfNXm8JE";
+      const envScript = `<script>window.CHRONICLES_ENV = Object.assign(window.CHRONICLES_ENV || {}, { SUPABASE_URL: ${JSON.stringify(supabaseUrl)}, SUPABASE_PUBLISHABLE_KEY: ${JSON.stringify(supabaseKey)}, SUPABASE_ANON_KEY: ${JSON.stringify(supabaseKey)} });</script>`;
+
+      if (content.includes('</head>')) {
+        content = content.replace('</head>', `${envScript}\n</head>`);
+      } else {
+        content = envScript + content;
+      }
+
+      const buffer = Buffer.from(content, 'utf8');
+      res.writeHead(200, {
+        ...commonHeaders,
+        'Content-Length': buffer.length
+      });
+      res.end(buffer);
+      return;
+    }
+
     const rangeHeader = req.headers && req.headers.range;
     if (rangeHeader) {
       const match = /^bytes=(\d*)-(\d*)$/.exec(rangeHeader.trim());

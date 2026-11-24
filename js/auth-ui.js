@@ -3,66 +3,69 @@
 (function () {
   "use strict";
 
-  const els = {
-    heading: document.getElementById("auth-heading"),
-    subheading: document.getElementById("auth-subheading"),
-    modeBadge: document.getElementById("auth-mode-badge"),
-    notice: document.getElementById("auth-notice"),
-    modeLogin: document.getElementById("auth-mode-login"),
-    modeSignup: document.getElementById("auth-mode-signup"),
-    loginForm: document.getElementById("login-form"),
-    signupForm: document.getElementById("signup-form"),
-    forgotForm: document.getElementById("forgot-form"),
-    loginSubmit: document.getElementById("login-submit"),
-    signupSubmit: document.getElementById("signup-submit"),
-    forgotSubmit: document.getElementById("forgot-submit"),
-    loginEmail: document.getElementById("login-email"),
-    loginPassword: document.getElementById("login-password"),
-    signupFullName: document.getElementById("signup-fullname"),
-    signupEmail: document.getElementById("signup-email"),
-    signupPassword: document.getElementById("signup-password"),
-    signupConfirm: document.getElementById("signup-confirm"),
-    signupInvite: document.getElementById("signup-invite"),
-    signupRole: document.getElementById("signup-role"),
-    validateInviteBtn: document.getElementById("validate-invite-btn"),
-    inviteStatus: document.getElementById("signup-invite-status"),
-    signupDetails: document.getElementById("signup-details"),
-    signupRoleDisplay: document.getElementById("signup-role-display"),
-    signupRoleNote: document.getElementById("signup-role-note"),
-    signupPhoto: document.getElementById("signup-photo"),
-    signupPhotoPreview: document.getElementById("signup-photo-preview"),
-    forgotEmail: document.getElementById("forgot-email"),
-    forgotLink: document.getElementById("forgot-password-link"),
-    backToLogin: document.getElementById("back-to-login"),
-    localAdminSetup: document.getElementById("local-admin-setup"),
-    adminSetupForm: document.getElementById("admin-setup-form"),
-    adminFullName: document.getElementById("admin-fullname"),
-    adminEmail: document.getElementById("admin-email"),
-    adminPassword: document.getElementById("admin-password"),
-    adminConfirm: document.getElementById("admin-confirm"),
-    adminSetupSubmit: document.getElementById("admin-setup-submit"),
-    adminSetupBack: document.getElementById("admin-setup-back"),
-    adminFirstInviteCode: document.getElementById("admin-first-invite-code"),
-    adminRegenerateCodeBtn: document.getElementById("admin-regenerate-code-btn"),
-    adminFirstInviteUses: document.getElementById("admin-first-invite-uses"),
-    adminFirstInviteExpires: document.getElementById("admin-first-invite-expires"),
-    adminSetupSuccess: document.getElementById("admin-setup-success"),
-    adminSuccessCode: document.getElementById("admin-success-code"),
-    adminSuccessRoleBadge: document.getElementById("admin-success-role-badge"),
-    adminSuccessCopyBtn: document.getElementById("admin-success-copy-btn"),
-    adminSuccessCopyText: document.getElementById("admin-success-copy-text"),
-    adminSuccessDetails: document.getElementById("admin-success-details"),
-    adminSuccessRedirectBtn: document.getElementById("admin-success-redirect-btn"),
-    resetForm: document.getElementById("reset-password-form"),
-    resetPasswordInput: document.getElementById("reset-password"),
-    resetConfirmInput: document.getElementById("reset-confirm"),
-    resetSubmit: document.getElementById("reset-submit"),
-    resetBackToLogin: document.getElementById("reset-back-to-login"),
-    ownerSetupWrapper: document.getElementById("owner-setup-wrapper"),
-    triggerOwnerAdminBtn: document.getElementById("trigger-owner-admin-btn"),
-    ownerSetupStatusMsg: document.getElementById("owner-setup-status-msg"),
-    modeTabsContainer: document.getElementById("auth-mode-login") ? document.getElementById("auth-mode-login").parentElement : null
-  };
+  const els = {};
+
+  function refreshElements() {
+    els.heading = document.getElementById("auth-heading");
+    els.subheading = document.getElementById("auth-subheading");
+    els.modeBadge = document.getElementById("auth-mode-badge");
+    els.notice = document.getElementById("auth-notice");
+    els.modeLogin = document.getElementById("auth-mode-login");
+    els.modeSignup = document.getElementById("auth-mode-signup");
+    els.loginForm = document.getElementById("login-form");
+    els.signupForm = document.getElementById("signup-form");
+    els.forgotForm = document.getElementById("forgot-form");
+    els.loginSubmit = document.getElementById("login-submit");
+    els.signupSubmit = document.getElementById("signup-submit");
+    els.forgotSubmit = document.getElementById("forgot-submit");
+    els.loginEmail = document.getElementById("login-email");
+    els.loginPassword = document.getElementById("login-password");
+    els.signupFullName = document.getElementById("signup-fullname");
+    els.signupEmail = document.getElementById("signup-email");
+    els.signupPassword = document.getElementById("signup-password");
+    els.signupConfirm = document.getElementById("signup-confirm");
+    els.signupInvite = document.getElementById("signup-invite");
+    els.signupRole = document.getElementById("signup-role");
+    els.validateInviteBtn = document.getElementById("validate-invite-btn");
+    els.inviteStatus = document.getElementById("signup-invite-status");
+    els.signupDetails = document.getElementById("signup-details");
+    els.signupRoleDisplay = document.getElementById("signup-role-display");
+    els.signupRoleNote = document.getElementById("signup-role-note");
+    els.signupPhoto = document.getElementById("signup-photo");
+    els.signupPhotoPreview = document.getElementById("signup-photo-preview");
+    els.forgotEmail = document.getElementById("forgot-email");
+    els.forgotLink = document.getElementById("forgot-password-link");
+    els.backToLogin = document.getElementById("back-to-login");
+    els.localAdminSetup = document.getElementById("local-admin-setup");
+    els.adminSetupForm = document.getElementById("admin-setup-form");
+    els.adminFullName = document.getElementById("admin-fullname");
+    els.adminEmail = document.getElementById("admin-email");
+    els.adminPassword = document.getElementById("admin-password");
+    els.adminConfirm = document.getElementById("admin-confirm");
+    els.adminSetupSubmit = document.getElementById("admin-setup-submit");
+    els.adminSetupBack = document.getElementById("admin-setup-back");
+    els.adminFirstInviteCode = document.getElementById("admin-first-invite-code");
+    els.adminRegenerateCodeBtn = document.getElementById("admin-regenerate-code-btn");
+    els.adminFirstInviteUses = document.getElementById("admin-first-invite-uses");
+    els.adminFirstInviteExpires = document.getElementById("admin-first-invite-expires");
+    els.adminSetupSuccess = document.getElementById("admin-setup-success");
+    els.adminSuccessCode = document.getElementById("admin-success-code");
+    els.adminSuccessRoleBadge = document.getElementById("admin-success-role-badge");
+    els.adminSuccessCopyBtn = document.getElementById("admin-success-copy-btn");
+    els.adminSuccessCopyText = document.getElementById("admin-success-copy-text");
+    els.adminSuccessDetails = document.getElementById("admin-success-details");
+    els.adminSuccessRedirectBtn = document.getElementById("admin-success-redirect-btn");
+    els.resetForm = document.getElementById("reset-password-form");
+    els.resetPasswordInput = document.getElementById("reset-password");
+    els.resetConfirmInput = document.getElementById("reset-confirm");
+    els.resetSubmit = document.getElementById("reset-submit");
+    els.resetBackToLogin = document.getElementById("reset-back-to-login");
+    els.ownerSetupWrapper = document.getElementById("owner-setup-wrapper");
+    els.triggerOwnerAdminBtn = document.getElementById("trigger-owner-admin-btn");
+    els.ownerSetupStatusMsg = document.getElementById("owner-setup-status-msg");
+    els.modeTabsContainer = els.modeLogin ? els.modeLogin.parentElement : (document.getElementById("auth-mode-login") ? document.getElementById("auth-mode-login").parentElement : null);
+  }
+  refreshElements();
 
   let activeMode = "login";
   let photoDataUrl = "";
@@ -212,7 +215,12 @@
     }
   }
 
-  function setMode(mode) {
+  function setMode(mode, event) {
+    if (event) {
+      if (typeof event.preventDefault === "function") event.preventDefault();
+      if (typeof event.stopPropagation === "function") event.stopPropagation();
+    }
+    refreshElements();
     activeMode = (mode === "signup" || mode === "forgot" || mode === "admin-setup" || mode === "reset") ? mode : "login";
     const isLogin = activeMode === "login";
     const isSignup = activeMode === "signup";
@@ -232,13 +240,13 @@
 
     if (els.modeLogin) {
       els.modeLogin.className = isLogin
-        ? "py-2 rounded-lg text-xs font-bold transition-colors bg-white text-[#354B3A] shadow-sm"
-        : "py-2 rounded-lg text-xs font-bold transition-colors text-[#282824]/60 hover:text-[#354B3A]";
+        ? "py-2.5 rounded-lg text-xs font-bold transition-colors bg-white text-[#354B3A] shadow-sm"
+        : "py-2.5 rounded-lg text-xs font-bold transition-colors text-[#282824]/60 hover:text-[#354B3A]";
     }
     if (els.modeSignup) {
       els.modeSignup.className = isSignup
-        ? "py-2 rounded-lg text-xs font-bold transition-colors bg-white text-[#354B3A] shadow-sm"
-        : "py-2 rounded-lg text-xs font-bold transition-colors text-[#282824]/60 hover:text-[#354B3A]";
+        ? "py-2.5 rounded-lg text-xs font-bold transition-colors bg-white text-[#354B3A] shadow-sm"
+        : "py-2.5 rounded-lg text-xs font-bold transition-colors text-[#282824]/60 hover:text-[#354B3A]";
     }
 
     if (els.heading) {
@@ -250,7 +258,7 @@
             ? "Reset Password"
             : isReset
               ? "Set New Password"
-              : "Trip Owner Setup";
+              : "Trip Owner / Admin Setup";
     }
     if (els.subheading) {
       els.subheading.textContent = isLogin
@@ -261,7 +269,7 @@
             ? "We will email you a secure reset link."
             : isReset
               ? "Enter your new secure password below to regain access."
-              : "One-time secure initialization for harshitvaidya28@gmail.com";
+              : "Dedicated initialization and status for harshitvaidya28@gmail.com";
     }
 
     if (els.adminSetupSuccess) {
@@ -273,6 +281,7 @@
     }
 
     if (isAdminSetup) {
+      checkAdminStatus();
       if (els.adminEmail) {
         els.adminEmail.value = (window.supabaseConfig && window.supabaseConfig.initialAdminEmail) || "harshitvaidya28@gmail.com";
       }
@@ -299,14 +308,19 @@
       window.setTimeout(function () { focusTarget.focus(); }, 60);
     }
 
-    const url = new URL(window.location.href);
-    if (isLogin) {
-      url.searchParams.delete("mode");
-    } else {
-      url.searchParams.set("mode", activeMode);
-    }
-    window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    try {
+      const url = new URL(window.location.href);
+      if (isLogin) {
+        url.searchParams.delete("mode");
+      } else {
+        url.searchParams.set("mode", activeMode);
+      }
+      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    } catch (e) {}
   }
+
+  // Globally expose setMode for fail-safe inline click handlers
+  window.setAuthMode = setMode;
 
   function updateModeBadge() {
     if (!els.modeBadge) return;
@@ -570,22 +584,43 @@
     try {
       const adminExists = await window.authService.hasActiveAdmin();
       if (adminExists) {
-        if (els.triggerOwnerAdminBtn) {
-          els.triggerOwnerAdminBtn.classList.add("hidden");
-        }
         if (els.ownerSetupStatusMsg) {
-          els.ownerSetupStatusMsg.innerHTML = '<span class="text-xs text-[#354B3A] font-semibold">🔒 Admin account is established. Log in above with your credentials.</span>';
+          els.ownerSetupStatusMsg.innerHTML = '<span class="text-xs text-[#354B3A] font-semibold">🔒 Admin account established. Click below to view status or log in.</span>';
         }
-        document.querySelectorAll(".trigger-owner-setup-link").forEach(function (el) {
-          el.classList.add("hidden");
-        });
-        if (activeMode === "admin-setup") {
-          setMode("login");
-          showNotice("An active Admin account is already configured. Please log in with your credentials.", "info");
-        }
-      } else {
-        if (els.triggerOwnerAdminBtn) {
-          els.triggerOwnerAdminBtn.classList.remove("hidden");
+
+        // Inside admin setup form, show the dedicated established card with direct Admin Log In button
+        let establishedCard = document.getElementById("admin-established-status-card");
+        if (!establishedCard && els.adminSetupForm) {
+          establishedCard = document.createElement("div");
+          establishedCard.id = "admin-established-status-card";
+          establishedCard.className = "p-4 bg-white rounded-xl border border-[#354B3A]/30 shadow-sm space-y-3 mb-4";
+          establishedCard.innerHTML = `
+            <div class="flex items-center gap-2 text-[#354B3A] font-bold">
+              <span class="text-lg">👑</span>
+              <span class="text-sm">Admin Account Established</span>
+            </div>
+            <p class="text-xs text-[#282824]/80 leading-relaxed">
+              The sole Administrator account for <strong>The 12 Chronicles</strong> is already active for <strong>harshitvaidya28@gmail.com</strong>.
+            </p>
+            <div class="pt-2 flex flex-col gap-2">
+              <button type="button" id="admin-established-login-btn" class="w-full py-3 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-xs font-bold transition-colors shadow-sm">
+                Log In to Admin Dashboard →
+              </button>
+            </div>
+          `;
+          els.adminSetupForm.prepend(establishedCard);
+          document.getElementById("admin-established-login-btn").addEventListener("click", function (e) {
+            e.preventDefault();
+            // If already logged in as Admin, redirect immediately
+            if (window.authService && window.authService.isAdmin()) {
+              window.location.replace("admin.html");
+              return;
+            }
+            setMode("login");
+            if (els.loginEmail) els.loginEmail.value = "harshitvaidya28@gmail.com";
+            if (els.loginPassword) els.loginPassword.focus();
+            showNotice("Enter your Admin password to access the Control Panel.", "info");
+          });
         }
       }
     } catch (e) {
@@ -620,10 +655,15 @@
   }
 
   function wireEvents() {
-    if (els.modeLogin) els.modeLogin.addEventListener("click", function () { setMode("login"); });
-    if (els.modeSignup) els.modeSignup.addEventListener("click", function () { setMode("signup"); });
-    if (els.forgotLink) els.forgotLink.addEventListener("click", function () { setMode("forgot"); });
-    if (els.backToLogin) els.backToLogin.addEventListener("click", function () { setMode("login"); });
+    refreshElements();
+    if (els.modeLogin) {
+      els.modeLogin.onclick = function (e) { setMode("login", e); };
+    }
+    if (els.modeSignup) {
+      els.modeSignup.onclick = function (e) { setMode("signup", e); };
+    }
+    if (els.forgotLink) els.forgotLink.addEventListener("click", function (e) { setMode("forgot", e); });
+    if (els.backToLogin) els.backToLogin.addEventListener("click", function (e) { setMode("login", e); });
     if (els.validateInviteBtn) els.validateInviteBtn.addEventListener("click", validateInvite);
     if (els.signupInvite) {
       els.signupInvite.addEventListener("input", function () {
@@ -645,10 +685,12 @@
     if (els.signupForm) els.signupForm.addEventListener("submit", handleSignup);
     if (els.forgotForm) els.forgotForm.addEventListener("submit", handleForgot);
     if (els.adminSetupForm) els.adminSetupForm.addEventListener("submit", handleAdminSetupSubmit);
-    if (els.adminSetupBack) els.adminSetupBack.addEventListener("click", function () { setMode("login"); });
-    if (els.triggerOwnerAdminBtn) els.triggerOwnerAdminBtn.addEventListener("click", function () { setMode("admin-setup"); });
+    if (els.adminSetupBack) els.adminSetupBack.addEventListener("click", function (e) { setMode("login", e); });
+    if (els.triggerOwnerAdminBtn) {
+      els.triggerOwnerAdminBtn.onclick = function (e) { setMode("admin-setup", e); };
+    }
     document.querySelectorAll(".trigger-owner-setup-link").forEach(function (el) {
-      el.addEventListener("click", function () { setMode("admin-setup"); });
+      el.addEventListener("click", function (e) { setMode("admin-setup", e); });
     });
     if (els.adminRegenerateCodeBtn) {
       els.adminRegenerateCodeBtn.addEventListener("click", function () {
@@ -679,7 +721,7 @@
       });
     }
     if (els.resetForm) els.resetForm.addEventListener("submit", handleResetPasswordSubmit);
-    if (els.resetBackToLogin) els.resetBackToLogin.addEventListener("click", function () { setMode("login"); });
+    if (els.resetBackToLogin) els.resetBackToLogin.addEventListener("click", function (e) { setMode("login", e); });
 
     window.addEventListener("chronicles:passwordRecovery", function () {
       setMode("reset");
@@ -689,7 +731,7 @@
 
     const triggerAdminBtn = document.getElementById("trigger-admin-setup-btn");
     if (triggerAdminBtn) {
-      triggerAdminBtn.addEventListener("click", function () { setMode("admin-setup"); });
+      triggerAdminBtn.addEventListener("click", function (e) { setMode("admin-setup", e); });
     }
 
     window.addEventListener("chronicles:authChanged", function (event) {
@@ -697,7 +739,7 @@
       if (detail.user && activeMode !== "forgot") {
         const params = new URLSearchParams(window.location.search);
         if (!params.get("stay")) {
-          window.location.replace(safeRedirectTarget());
+          window.location.replace(safeRedirectTarget(detail.user));
         }
       }
     });
@@ -705,6 +747,7 @@
 
   async function init() {
     try {
+      refreshElements();
       resetPhotoPreview();
       wirePasswordToggles();
       wirePhotoPreview();
@@ -737,8 +780,8 @@
         if (notice) {
           showNotice(notice, window.authService.mode === "supabase" ? "info" : "error");
           window.authService.clearAuthNotice();
-        } else if (window.authService.mode !== "supabase") {
-          showNotice("Supabase Authentication is not connected. Please add your Supabase Project URL and Anon Key in js/supabase-config.js (or click Supabase Connection Settings below).", "error");
+        } else if (window.authService.mode === "error") {
+          showNotice("Supabase client connection error. Please verify project credentials.", "error");
         }
         if (window.authService.isPendingTreasurer()) {
           showNotice("Your Treasurer request is pending Admin approval. You currently have Member access.", "info");

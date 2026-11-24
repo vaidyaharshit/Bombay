@@ -1,5 +1,5 @@
 // The 12 Chronicles — Supabase Configuration
-// Configure your Supabase project credentials below or via the in-app connection modal.
+// Supports Vercel environment variables (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) and hardcoded production fallbacks.
 
 (function () {
   "use strict";
@@ -12,26 +12,47 @@
     initialAdminEmail: "harshitvaidya28@gmail.com"
   };
 
+  function isValid(url, key) {
+    return !!(
+      url && typeof url === "string" && url.trim() &&
+      !url.includes("your-project-id") &&
+      key && typeof key === "string" && key.trim() &&
+      !key.includes("...")
+    );
+  }
+
   function getActiveConfig() {
+    // 1. Check window.CHRONICLES_ENV (injected by Vercel server.js runtime)
+    if (window.CHRONICLES_ENV) {
+      const url = window.CHRONICLES_ENV.SUPABASE_URL;
+      const key = window.CHRONICLES_ENV.SUPABASE_PUBLISHABLE_KEY || window.CHRONICLES_ENV.SUPABASE_ANON_KEY;
+      if (isValid(url, key)) {
+        return {
+          supabaseUrl: url.trim(),
+          supabaseAnonKey: key.trim(),
+          initialAdminEmail: DEFAULT_CONFIG.initialAdminEmail
+        };
+      }
+    }
+
+    // 2. Check localStorage (only if valid, ignoring placeholders)
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && parsed.supabaseUrl && parsed.supabaseAnonKey) {
-          return parsed;
+        if (parsed && isValid(parsed.supabaseUrl, parsed.supabaseAnonKey)) {
+          return {
+            supabaseUrl: parsed.supabaseUrl.trim(),
+            supabaseAnonKey: parsed.supabaseAnonKey.trim(),
+            initialAdminEmail: DEFAULT_CONFIG.initialAdminEmail
+          };
         }
       }
     } catch (e) {
       console.warn("Could not read saved Supabase config from localStorage:", e);
     }
 
-    if (window.CHRONICLES_ENV && window.CHRONICLES_ENV.SUPABASE_URL) {
-      return {
-        supabaseUrl: window.CHRONICLES_ENV.SUPABASE_URL,
-        supabaseAnonKey: window.CHRONICLES_ENV.SUPABASE_ANON_KEY || ""
-      };
-    }
-
+    // 3. Fallback to default real project config
     return DEFAULT_CONFIG;
   }
 
@@ -39,14 +60,6 @@
 
   window.isSupabaseConfigured = function () {
     const cfg = window.supabaseConfig;
-    return !!(
-      cfg &&
-      cfg.supabaseUrl &&
-      cfg.supabaseUrl.trim() &&
-      !cfg.supabaseUrl.includes("your-project-id") &&
-      cfg.supabaseAnonKey &&
-      cfg.supabaseAnonKey.trim() &&
-      !cfg.supabaseAnonKey.includes("...")
-    );
+    return !!(cfg && isValid(cfg.supabaseUrl, cfg.supabaseAnonKey));
   };
 })();

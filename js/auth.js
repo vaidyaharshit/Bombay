@@ -180,22 +180,32 @@
       const page = currentPage();
       const protectedPages = new Set(["admin.html", "squad.html", "expenses.html", "planner.html", "schedule.html", "explore.html", "hall-of-fame.html", "memories.html"]);
 
-      if (protectedPages.has(page) || page === "auth.html") {
+      if (protectedPages.has(page)) {
         document.documentElement.classList.add("auth-loading");
       }
 
       if (window.isSupabaseConfigured && window.isSupabaseConfigured()) {
         try {
           const cfg = window.supabaseConfig;
-          this.supabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
-            auth: {
-              persistSession: true,
-              autoRefreshToken: true
+          if (!window.supabase || typeof window.supabase.createClient !== "function") {
+            for (let i = 0; i < 20; i++) {
+              if (window.supabase && typeof window.supabase.createClient === "function") break;
+              await new Promise(r => setTimeout(r, 100));
             }
-          });
-          this.mode = "supabase";
-          await this.initSession();
-          this.subscribeRealtimeProfiles();
+          }
+          if (window.supabase && typeof window.supabase.createClient === "function") {
+            this.supabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+              auth: {
+                persistSession: true,
+                autoRefreshToken: true
+              }
+            });
+            this.mode = "supabase";
+            await this.initSession();
+            this.subscribeRealtimeProfiles();
+          } else {
+            throw new Error("Supabase JS library did not load.");
+          }
         } catch (error) {
           console.error("Supabase client init failed:", error);
           this.mode = "error";
