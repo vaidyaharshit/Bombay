@@ -28,16 +28,44 @@ const server = http.createServer((req, res) => {
       safePath = '/index.html';
     }
 
-    const filePath = path.join(__dirname, safePath);
+    let filePath = path.join(__dirname, safePath);
 
-    fs.stat(filePath, (err, stats) => {
-      if (err || !stats.isFile()) {
+    function resolveFile(candidatePath, callback) {
+      fs.stat(candidatePath, (err, stats) => {
+        if (!err && stats.isFile()) {
+          callback(candidatePath, stats);
+          return;
+        }
+
+        // Try clean URL with .html
+        const withHtml = candidatePath + '.html';
+        fs.stat(withHtml, (err2, stats2) => {
+          if (!err2 && stats2.isFile()) {
+            callback(withHtml, stats2);
+            return;
+          }
+
+          // Try public directory fallback
+          const publicFallback = path.join(__dirname, 'public', safePath);
+          fs.stat(publicFallback, (err3, stats3) => {
+            if (!err3 && stats3.isFile()) {
+              callback(publicFallback, stats3);
+              return;
+            }
+            callback(null, null);
+          });
+        });
+      });
+    }
+
+    resolveFile(filePath, (resolvedPath, stats) => {
+      if (!resolvedPath || !stats) {
         res.writeHead(404, { 'Content-Type': 'text/plain; charset=UTF-8' });
         res.end(`404 Not Found: ${req.url}`);
         return;
       }
 
-      const ext = path.extname(filePath).toLowerCase();
+      const ext = path.extname(resolvedPath).toLowerCase();
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
       const commonHeaders = {
         'Content-Type': contentType,
@@ -82,7 +110,7 @@ const server = http.createServer((req, res) => {
           'Content-Length': end - start + 1
         });
 
-        fs.createReadStream(filePath, { start, end }).pipe(res);
+        fs.createReadStream(resolvedPath, { start, end }).pipe(res);
         return;
       }
 
@@ -91,7 +119,7 @@ const server = http.createServer((req, res) => {
         'Content-Length': stats.size
       });
 
-      fs.createReadStream(filePath).pipe(res);
+      fs.createReadStream(resolvedPath).pipe(res);
     });
   } catch (e) {
     res.writeHead(500, { 'Content-Type': 'text/plain; charset=UTF-8' });

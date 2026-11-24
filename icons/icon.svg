@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <rect width="512" height="512" rx="128" fill="#354B3A"/>
+  <!-- Concentric journey ring in Terracotta -->
+  <circle cx="256" cy="256" r="190" fill="none" stroke="#C76B4A" stroke-width="6" stroke-dasharray="16 12" opacity="0.6"/>
+  <!-- Minimal Gateway Arch Silhouette in Warm Ivory -->
+  <path d="M190 350 V 220 A 66 66 0 0 1 322 220 V 350 H 290 V 230 A 34 34 0 0 0 222 230 V 350 Z" fill="#F7F4EC"/>
+  <!-- Minimal Central 12 Numeral -->
+  <text x="256" y="325" font-family="'Playfair Display', Georgia, serif" font-size="52" font-weight="bold" fill="#354B3A" text-anchor="middle">12</text>
+  <!-- Small Star / Compass Accent -->
+  <polygon points="256,120 263,142 286,142 267,156 274,178 256,164 238,178 245,156 226,142 249,142" fill="#C76B4A"/>
+</svg>
+

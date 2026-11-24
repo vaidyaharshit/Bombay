@@ -45,7 +45,8 @@
     const navContainer = document.getElementById("global-nav");
     if (!navContainer) return;
 
-    const currentPath = window.location.pathname.split("/").pop() || "index.html";
+    const rawPath = window.location.pathname.split("/").pop() || "index.html";
+    const currentPath = (!rawPath || rawPath === "/") ? "index.html" : (rawPath.endsWith(".html") ? rawPath : (rawPath + ".html"));
     const user = window.authService ? window.authService.getCurrentUser() : null;
     const authenticated = !!user;
     const isAdmin = !!(window.authService && window.authService.isAdmin());
@@ -272,12 +273,13 @@
 
     if (!daysEl) return;
 
-    const targetDate = new Date("2026-12-25T09:00:00+05:30").getTime();
+    // Dec 25, 2026 09:00:00 IST = Dec 25, 2026 03:30:00 UTC
+    const targetDate = Date.UTC(2026, 11, 25, 3, 30, 0);
 
     function update() {
-      const distance = targetDate - new Date().getTime();
+      const distance = targetDate - Date.now();
 
-      if (distance < 0) {
+      if (isNaN(distance) || distance < 0) {
         if (daysEl) daysEl.innerText = "00";
         if (hoursEl) hoursEl.innerText = "00";
         if (minutesEl) minutesEl.innerText = "00";
@@ -297,7 +299,9 @@
     }
 
     update();
-    setInterval(update, 1000);
+    if (!window._countdownTimerInterval) {
+      window._countdownTimerInterval = setInterval(update, 1000);
+    }
   };
 
   // Supabase Configuration Modal
@@ -362,7 +366,15 @@
   // Backward compatibility alias
   window.openFirebaseSettingsModal = window.openSupabaseSettingsModal;
 
-  document.addEventListener("DOMContentLoaded", function () {
+  function runWhenReady(fn) {
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+      fn();
+    } else {
+      document.addEventListener("DOMContentLoaded", fn);
+    }
+  }
+
+  runWhenReady(function () {
     initNavigation();
     initCountdownTimer();
     showStoredFlash();

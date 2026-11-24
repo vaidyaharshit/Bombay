@@ -51,7 +51,8 @@
     <div class="hero-media absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
       <!-- Poster fallback shown until video loads -->
       <img src="public/images/mumbai-hero-poster.jpg" alt="" aria-hidden="true" id="hero-poster-fallback"
-        class="hero-poster absolute inset-0 w-full h-full object-cover select-none" />
+        class="hero-poster absolute inset-0 w-full h-full object-cover select-none"
+        onerror="if(!this.dataset.triedSvg){this.dataset.triedSvg='1';this.src='public/images/mumbai-hero-poster.svg';}else if(!this.dataset.triedRoot){this.dataset.triedRoot='1';this.src='images/mumbai-hero-poster.jpg';}" />
 
       <!-- Mumbai cinematic video — autoplays muted & loops -->
       <video id="hero-video"
@@ -59,6 +60,7 @@
         autoplay muted loop playsinline webkit-playsinline preload="metadata"
         poster="public/images/mumbai-hero-poster.jpg" tabindex="-1" disablepictureinpicture>
         <source src="public/videos/mumbai-real-footage.mp4" type="video/mp4" />
+        <source src="videos/mumbai-real-footage.mp4" type="video/mp4" />
       </video>
     </div>
 
@@ -418,67 +420,73 @@
       })();
   </script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
+    async function refreshHome() {
       const auth = window.authService;
-      if (auth) {
-        await auth.ready;
+      if (auth && auth.ready) {
+        try {
+          await auth.ready;
+        } catch (e) {
+          console.warn('auth.ready error:', e);
+        }
       }
 
-      async function refreshHome() {
-        const user = auth ? auth.getCurrentUser() : null;
-        const membership = document.getElementById('membership-section');
-        const dashboard = document.getElementById('member-dashboard');
-        const modeNote = document.getElementById('membership-mode-note');
-        const heroPill = document.getElementById('hero-member-pill');
-        const heroActions = document.getElementById('hero-actions');
+      const user = auth ? auth.getCurrentUser() : null;
+      const membership = document.getElementById('membership-section');
+      const dashboard = document.getElementById('member-dashboard');
+      const modeNote = document.getElementById('membership-mode-note');
+      const heroPill = document.getElementById('hero-member-pill');
+      const heroActions = document.getElementById('hero-actions');
 
-        if (membership) membership.classList.toggle('hidden', !!user);
-        if (dashboard) dashboard.classList.toggle('hidden', !user);
+      if (membership) membership.classList.toggle('hidden', !!user);
+      if (dashboard) dashboard.classList.toggle('hidden', !user);
 
-        if (heroPill) {
-          const count = auth ? auth.getAllMembers().length : 0;
-          heroPill.textContent = user
-            ? count + ' Members Registered'
-            : 'Private Member Circle';
-        }
+      if (heroPill) {
+        const count = auth ? auth.getAllMembers().length : 0;
+        heroPill.textContent = user
+          ? count + ' Members Registered'
+          : 'Private Member Circle';
+      }
 
-        if (heroActions) {
-          heroActions.innerHTML = user
-            ? `
-              <a href="schedule.html" class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
-                <span>Explore Itinerary</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-              </a>
-              <a href="hall-of-fame.html" class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm">
-                <span>Hall of Fame Photos</span>
-              </a>
-            `
-            : `
-              <a href="auth.html?mode=login" class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
-                <span>Member Log In</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-              </a>
-              <a href="auth.html?mode=signup" class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm">
-                <span>Create Member Account</span>
-              </a>
-            `;
-        }
+      if (heroActions) {
+        heroActions.innerHTML = user
+          ? `
+            <a href="schedule.html" class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+              <span>Explore Itinerary</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
+            <a href="hall-of-fame.html" class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm">
+              <span>Hall of Fame Photos</span>
+            </a>
+          `
+          : `
+            <a href="auth.html?mode=login" class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+              <span>Member Log In</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
+            <a href="auth.html?mode=signup" class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm">
+              <span>Create Member Account</span>
+            </a>
+          `;
+      }
 
-        if (modeNote) {
-          const mode = auth ? auth.mode : 'unconfigured';
-          modeNote.textContent = mode === 'supabase'
-            ? 'Connected to Supabase Authentication and PostgreSQL. Member accounts, roles and expenses sync across devices in real time.'
-            : 'Supabase is not configured yet. Add your Project URL and Anon Key via the footer settings to connect.';
-        }
+      if (modeNote) {
+        const isConfigured = (window.isSupabaseConfigured && window.isSupabaseConfigured());
+        const mode = (auth && auth.mode && auth.mode !== 'unconfigured') ? auth.mode : (isConfigured ? 'supabase' : 'unconfigured');
+        const isConnected = mode === 'supabase';
+        modeNote.textContent = isConnected
+          ? 'Connected to Supabase Authentication and PostgreSQL. Member accounts, roles and expenses sync across devices in real time.'
+          : 'Supabase is not configured yet. Add your Project URL and Anon Key via the footer settings to connect.';
+      }
 
-        if (!user) return;
+      if (!user) return;
 
-        const welcome = document.getElementById('member-welcome');
-        if (welcome) welcome.textContent = user.nickname || user.fullName;
+      const welcome = document.getElementById('member-welcome');
+      if (welcome) welcome.textContent = user.nickname || user.fullName;
 
-        const profileLink = document.getElementById('member-profile-link');
-        if (profileLink) profileLink.href = 'squad.html';
+      const profileLink = document.getElementById('member-profile-link');
+      if (profileLink) profileLink.href = 'squad.html';
 
+      if (window.chroniclesData && window.chroniclesData.getSchedule) {
         const schedule = await window.chroniclesData.getSchedule();
         const upcomingBanner = document.getElementById('upcoming-banner');
         if (upcomingBanner && schedule.length > 0) {
@@ -511,36 +519,44 @@
             </div>
           `;
         }
-
-        const preview = document.getElementById('home-photos-preview');
-        if (preview) {
-          const photos = await window.chroniclesData.getPhotos();
-          const featured = (photos || []).slice(0, 3);
-          preview.innerHTML = featured.length
-            ? featured.map(photo => `
-                <a href="hall-of-fame.html" class="journal-card overflow-hidden bg-white group">
-                  <div class="h-48 overflow-hidden bg-[#F7F4EC]">
-                    <img src="${photo.url}" alt="${photo.title || 'Trip photo'}" loading="lazy"
-                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  </div>
-                  <div class="p-4">
-                    <p class="text-[10px] uppercase tracking-wider font-bold text-[#A4A88A]">${photo.album || 'Memories'}</p>
-                    <h3 class="font-serif text-sm font-bold text-[#282824] mt-1">${photo.title || 'Untitled memory'}</h3>
-                  </div>
-                </a>
-              `).join('')
-            : `
-              <div class="sm:col-span-2 lg:col-span-3 text-center py-10 bg-white rounded-xl border border-[#A4A88A]/30">
-                <p class="font-serif text-base font-bold text-[#282824]">No photos shared yet</p>
-                <p class="text-xs text-[#282824]/60 mt-1">Add the first memory in the Hall of Fame.</p>
-              </div>
-            `;
-        }
       }
 
-      await refreshHome();
-      window.addEventListener('chronicles:authChanged', refreshHome);
-    });
+      const preview = document.getElementById('home-photos-preview');
+      if (preview && window.chroniclesData && window.chroniclesData.getPhotos) {
+        const photos = await window.chroniclesData.getPhotos();
+        const featured = (photos || []).slice(0, 3);
+        preview.innerHTML = featured.length
+          ? featured.map(photo => `
+              <a href="hall-of-fame.html" class="journal-card overflow-hidden bg-white group">
+                <div class="h-48 overflow-hidden bg-[#F7F4EC]">
+                  <img src="${photo.url}" alt="${photo.title || 'Trip photo'}" loading="lazy"
+                       class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                </div>
+                <div class="p-4">
+                  <p class="text-[10px] uppercase tracking-wider font-bold text-[#A4A88A]">${photo.album || 'Memories'}</p>
+                  <h3 class="font-serif text-sm font-bold text-[#282824] mt-1">${photo.title || 'Untitled memory'}</h3>
+                </div>
+              </a>
+            `).join('')
+          : `
+            <div class="sm:col-span-2 lg:col-span-3 text-center py-10 bg-white rounded-xl border border-[#A4A88A]/30">
+              <p class="font-serif text-base font-bold text-[#282824]">No photos shared yet</p>
+              <p class="text-xs text-[#282824]/60 mt-1">Add the first memory in the Hall of Fame.</p>
+            </div>
+          `;
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', refreshHome);
+    } else {
+      refreshHome();
+    }
+
+    window.addEventListener('chronicles:authReady', refreshHome);
+    window.addEventListener('chronicles:authChanged', refreshHome);
+    window.addEventListener('chronicles:membersChanged', refreshHome);
+  </script>
   </script>
 </body>
 

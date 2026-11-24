@@ -71,27 +71,29 @@
   let isAdminSetupMode = false;
 
   function safeRedirectTarget(user) {
+    const currentUser = user || (window.authService ? window.authService.getCurrentUser() : null);
     const params = new URLSearchParams(window.location.search);
     const raw = params.get("redirect");
     if (raw) {
       let decoded = raw;
       try { decoded = decodeURIComponent(raw); } catch (error) { /* keep raw */ }
-      if (/^[a-z0-9][a-z0-9._-]*\.html(\?[^#]*)?$/i.test(decoded) && decoded.toLowerCase().indexOf("auth.html") !== 0) {
-        if (decoded.toLowerCase().indexOf("admin.html") === 0) {
-          if (user && user.role === "Admin" && user.roleStatus === "approved") {
-            return decoded;
-          }
-          return "index.html";
+      const cleanPath = decoded.split("?")[0].toLowerCase();
+      if (cleanPath === "admin" || cleanPath === "admin.html") {
+        if (currentUser && currentUser.role === "Admin" && currentUser.roleStatus === "approved") {
+          return decoded;
         }
+        return "index.html";
+      }
+      if (cleanPath !== "auth" && cleanPath !== "auth.html") {
         return decoded;
       }
     }
 
-    if (user) {
-      if (user.role === "Admin" && user.roleStatus === "approved") {
+    if (currentUser) {
+      if (currentUser.role === "Admin" && currentUser.roleStatus === "approved") {
         return "admin.html";
       }
-      if (user.role === "Treasurer" && user.roleStatus === "approved") {
+      if (currentUser.role === "Treasurer" && currentUser.roleStatus === "approved") {
         return "expenses.html";
       }
       return "index.html";

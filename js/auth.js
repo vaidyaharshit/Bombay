@@ -140,7 +140,9 @@
   }
 
   function currentPage() {
-    return window.location.pathname.split("/").pop() || "index.html";
+    const raw = window.location.pathname.split("/").pop() || "index.html";
+    if (!raw || raw === "/") return "index.html";
+    return raw.endsWith(".html") ? raw : (raw + ".html");
   }
 
   function friendlyAuthError(error) {
