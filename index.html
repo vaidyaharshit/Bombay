@@ -73,7 +73,7 @@
       <div
         class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-[#A4A88A]/40 shadow-sm backdrop-blur-sm mb-6 animate-fade-in">
         <span class="w-2 h-2 rounded-full bg-[#354B3A] animate-pulse"></span>
-        <span id="hero-member-pill" class="text-xs font-semibold uppercase tracking-wider text-[#354B3A]">Private Member Circle</span>
+        <span id="hero-member-pill" class="text-xs font-semibold uppercase tracking-wider text-[#354B3A]">12 Members • The Fellowship</span>
         <span class="text-[#A4A88A]">•</span>
         <span class="text-xs font-medium text-[#282824]">Dec 24 – 29, 2026</span>
       </div>
@@ -124,107 +124,37 @@
 
       <!-- Action Buttons -->
       <div id="hero-actions" class="flex flex-wrap items-center justify-center gap-4">
-        <a href="auth.html?mode=login"
+        <a href="schedule.html"
           class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
-          <span>Member Log In</span>
+          <span>Explore Master Schedule</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
           </svg>
         </a>
-        <a href="auth.html?mode=signup"
+        <a href="explore.html"
           class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm flex items-center gap-2">
-          <span>Join with Invite</span>
+          <span>Explore Mumbai</span>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Below Hero: Public membership entry + private member dashboard -->
+  <!-- Below Hero: Trip Command Center & Shared Features -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1 w-full">
 
-    <!-- Public Membership Section -->
-    <section id="membership-section" class="max-w-4xl mx-auto">
-      <div class="text-center max-w-2xl mx-auto mb-10">
-        <span class="text-xs uppercase tracking-widest font-bold text-[#C76B4A]">Private Membership</span>
-        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-[#282824] mt-1">A journal kept by the twelve</h2>
-        <p class="text-xs sm:text-sm text-[#282824]/70 mt-3 leading-relaxed">
-          The itinerary, live expense ledger, squad directory and shared memories are private to verified members.
-          Log in with your member account or join using the group invitation code.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="journal-card p-6 sm:p-7 bg-white flex flex-col">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-10 h-10 rounded-xl bg-[#354B3A]/10 text-[#354B3A] flex items-center justify-center text-lg">🔐</div>
-            <h3 class="font-serif text-xl font-bold text-[#282824]">Already a member?</h3>
-          </div>
-          <p class="text-xs text-[#282824]/70 leading-relaxed flex-1">
-            Sign in with the email and password you registered with. Your role and permissions are loaded automatically.
-          </p>
-          <a href="auth.html?mode=login"
-            class="mt-5 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold transition-colors">
-            <span>Log In</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-          </a>
-        </div>
-
-        <div class="journal-card p-6 sm:p-7 bg-white flex flex-col">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-10 h-10 rounded-xl bg-[#C76B4A]/10 text-[#C76B4A] flex items-center justify-center text-lg">🪪</div>
-            <h3 class="font-serif text-xl font-bold text-[#282824]">New to the squad?</h3>
-          </div>
-          <p class="text-xs text-[#282824]/70 leading-relaxed flex-1">
-            Create your member account with the private invitation code. Treasurer access requires Admin approval after registration.
-          </p>
-          <a href="auth.html?mode=signup"
-            class="mt-5 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white border border-[#354B3A]/40 hover:bg-[#F7F4EC] text-[#354B3A] text-sm font-semibold transition-colors">
-            <span>Join with Invite</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-          </a>
-        </div>
-      </div>
-
-      <!-- Discreet Trip Owner Link -->
-      <div id="homepage-admin-entry" class="mt-4 text-center">
-        <a href="auth.html?mode=admin-setup"
-          class="inline-flex items-center gap-1.5 text-xs text-[#C76B4A] hover:text-[#9e4a2d] font-semibold px-3 py-1.5 rounded-lg hover:bg-[#C76B4A]/10 transition-colors">
-          <span>👑</span>
-          <span>Trip Owner? Set Up Admin Account</span>
-        </a>
-      </div>
-
-      <div id="membership-mode-note"
-        class="mt-6 p-4 rounded-xl bg-white border border-[#A4A88A]/30 text-[11px] text-[#282824]/70 text-center leading-relaxed">
-        Checking connection mode…
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-        <div class="p-4 bg-white rounded-xl border border-[#A4A88A]/25">
-          <p class="text-xs font-bold text-[#282824]">Member</p>
-          <p class="text-[11px] text-[#282824]/65 mt-1">View the schedule, squad, planner and shared memories.</p>
-        </div>
-        <div class="p-4 bg-white rounded-xl border border-[#A4A88A]/25">
-          <p class="text-xs font-bold text-[#282824]">Treasurer</p>
-          <p class="text-[11px] text-[#282824]/65 mt-1">Approved by an Admin, can manage the shared expense ledger.</p>
-        </div>
-        <div class="p-4 bg-white rounded-xl border border-[#A4A88A]/25">
-          <p class="text-xs font-bold text-[#282824]">Admin</p>
-          <p class="text-[11px] text-[#282824]/65 mt-1">Reviews Treasurer requests and has full ledger access.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Private Member Dashboard -->
-    <div id="member-dashboard" class="hidden space-y-16">
+    <!-- Trip Command Center Dashboard -->
+    <div id="member-dashboard" class="space-y-16">
       <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <span class="text-xs uppercase tracking-widest font-bold text-[#C76B4A]">Member Dashboard</span>
+          <span class="text-xs uppercase tracking-widest font-bold text-[#C76B4A]">Trip Command Center</span>
           <h2 class="font-serif text-2xl sm:text-3xl font-bold text-[#282824] mt-1">
-            Welcome, <span id="member-welcome">friend</span>
+            The 12 Chronicles Dashboard
           </h2>
         </div>
-        <a href="auth.html" id="member-profile-link" class="text-xs font-semibold text-[#354B3A] hover:underline">View my account</a>
+        <a href="squad.html" class="text-xs font-semibold text-[#354B3A] hover:underline flex items-center gap-1">
+          <span>View Squad Directory</span>
+          <span>➔</span>
+        </a>
       </div>
 
       <div id="upcoming-banner"></div>
@@ -430,120 +360,81 @@
         }
       }
 
-      const user = auth ? auth.getCurrentUser() : null;
-      const membership = document.getElementById('membership-section');
-      const dashboard = document.getElementById('member-dashboard');
-      const modeNote = document.getElementById('membership-mode-note');
-      const heroPill = document.getElementById('hero-member-pill');
-      const heroActions = document.getElementById('hero-actions');
-
-      if (membership) membership.classList.toggle('hidden', !!user);
-      if (dashboard) dashboard.classList.toggle('hidden', !user);
-
-      if (heroPill) {
-        const count = auth ? auth.getAllMembers().length : 0;
-        heroPill.textContent = user
-          ? count + ' Members Registered'
-          : 'Private Member Circle';
-      }
-
-      if (heroActions) {
-        heroActions.innerHTML = user
-          ? `
-            <a href="schedule.html" class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
-              <span>Explore Itinerary</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </a>
-            <a href="hall-of-fame.html" class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm">
-              <span>Hall of Fame Photos</span>
-            </a>
-          `
-          : `
-            <a href="auth.html?mode=login" class="px-7 py-3.5 rounded-xl bg-[#354B3A] hover:bg-[#243428] text-white text-sm font-semibold tracking-wide transition-all shadow-md hover:shadow-lg flex items-center gap-2">
-              <span>Member Log In</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </a>
-            <a href="auth.html?mode=signup" class="px-7 py-3.5 rounded-xl bg-white hover:bg-[#F7F4EC] text-[#282824] border border-[#A4A88A]/40 text-sm font-semibold tracking-wide transition-all shadow-sm">
-              <span>Create Member Account</span>
-            </a>
-          `;
-      }
-
-      if (modeNote) {
-        const isConfigured = (window.isSupabaseConfigured && window.isSupabaseConfigured());
-        const mode = (auth && auth.mode && auth.mode !== 'unconfigured') ? auth.mode : (isConfigured ? 'supabase' : 'unconfigured');
-        const isConnected = mode === 'supabase';
-        modeNote.textContent = isConnected
-          ? 'Connected to Supabase Authentication and PostgreSQL. Member accounts, roles and expenses sync across devices in real time.'
-          : 'Supabase is not configured yet. Add your Project URL and Anon Key via the footer settings to connect.';
-      }
-
-      if (!user) return;
-
       const welcome = document.getElementById('member-welcome');
-      if (welcome) welcome.textContent = user.nickname || user.fullName;
+      if (welcome) {
+        const user = auth ? auth.getCurrentUser() : null;
+        welcome.textContent = (user && (user.nickname || user.fullName)) || 'The 12';
+      }
 
       const profileLink = document.getElementById('member-profile-link');
       if (profileLink) profileLink.href = 'squad.html';
 
       if (window.chroniclesData && window.chroniclesData.getSchedule) {
-        const schedule = await window.chroniclesData.getSchedule();
-        const upcomingBanner = document.getElementById('upcoming-banner');
-        if (upcomingBanner && schedule.length > 0) {
-          const item = schedule.find(i => i.status !== 'Completed') || schedule[0];
-          upcomingBanner.innerHTML = `
-            <div class="bg-[#354B3A] text-white p-6 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div class="flex items-start sm:items-center gap-4">
-                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-xl flex-shrink-0">
-                  🧭
-                </div>
-                <div>
-                  <div class="flex items-center gap-2">
-                    <span class="text-[11px] uppercase tracking-wider font-bold text-[#F7F4EC]/80">Next Activity on Master Schedule</span>
-                    <span class="text-[10px] px-2 py-0.5 bg-[#C76B4A] text-white rounded-full font-bold">Day ${item.day} • ${item.time}</span>
+        try {
+          const schedule = await window.chroniclesData.getSchedule();
+          const upcomingBanner = document.getElementById('upcoming-banner');
+          if (upcomingBanner && schedule && schedule.length > 0) {
+            const item = schedule.find(i => i.status !== 'Completed') || schedule[0];
+            upcomingBanner.innerHTML = `
+              <div class="bg-[#354B3A] text-white p-6 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-start sm:items-center gap-4">
+                  <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-xl flex-shrink-0">
+                    🧭
                   </div>
-                  <h3 class="font-serif text-xl font-bold text-white mt-0.5">${item.title}</h3>
-                  <p class="text-xs text-white/80 line-clamp-1">${item.location}</p>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-[11px] uppercase tracking-wider font-bold text-[#F7F4EC]/80">Next Activity on Master Schedule</span>
+                      <span class="text-[10px] px-2 py-0.5 bg-[#C76B4A] text-white rounded-full font-bold">Day ${item.day} • ${item.time}</span>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold text-white mt-0.5">${item.title}</h3>
+                    <p class="text-xs text-white/80 line-clamp-1">${item.location}</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <a href="${item.mapUrl || '#'}" target="_blank" rel="noopener noreferrer"
+                     class="px-4 py-2.5 bg-white text-[#354B3A] rounded-xl text-xs font-bold hover:bg-[#F7F4EC] transition-colors flex items-center gap-1.5 shadow-sm">
+                    <span>Directions</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                  </a>
+                  <a href="schedule.html" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors">
+                    View Timeline
+                  </a>
                 </div>
               </div>
-              <div class="flex items-center gap-3">
-                <a href="${item.mapUrl}" target="_blank" rel="noopener noreferrer"
-                   class="px-4 py-2.5 bg-white text-[#354B3A] rounded-xl text-xs font-bold hover:bg-[#F7F4EC] transition-colors flex items-center gap-1.5 shadow-sm">
-                  <span>Directions</span>
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </a>
-                <a href="schedule.html" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors">
-                  View Timeline
-                </a>
-              </div>
-            </div>
-          `;
+            `;
+          }
+        } catch (err) {
+          console.warn('Error loading upcoming schedule:', err);
         }
       }
 
       const preview = document.getElementById('home-photos-preview');
       if (preview && window.chroniclesData && window.chroniclesData.getPhotos) {
-        const photos = await window.chroniclesData.getPhotos();
-        const featured = (photos || []).slice(0, 3);
-        preview.innerHTML = featured.length
-          ? featured.map(photo => `
-              <a href="hall-of-fame.html" class="journal-card overflow-hidden bg-white group">
-                <div class="h-48 overflow-hidden bg-[#F7F4EC]">
-                  <img src="${photo.url}" alt="${photo.title || 'Trip photo'}" loading="lazy"
-                       class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                </div>
-                <div class="p-4">
-                  <p class="text-[10px] uppercase tracking-wider font-bold text-[#A4A88A]">${photo.album || 'Memories'}</p>
-                  <h3 class="font-serif text-sm font-bold text-[#282824] mt-1">${photo.title || 'Untitled memory'}</h3>
-                </div>
-              </a>
-            `).join('')
-          : `
-            <div class="sm:col-span-2 lg:col-span-3 text-center py-10 bg-white rounded-xl border border-[#A4A88A]/30">
-              <p class="font-serif text-base font-bold text-[#282824]">No photos shared yet</p>
-              <p class="text-xs text-[#282824]/60 mt-1">Add the first memory in the Hall of Fame.</p>
-            </div>
-          `;
+        try {
+          const photos = await window.chroniclesData.getPhotos();
+          const featured = (photos || []).slice(0, 3);
+          preview.innerHTML = featured.length
+            ? featured.map(photo => `
+                <a href="hall-of-fame.html" class="journal-card overflow-hidden bg-white group">
+                  <div class="h-48 overflow-hidden bg-[#F7F4EC]">
+                    <img src="${photo.url}" alt="${photo.title || 'Trip photo'}" loading="lazy"
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  </div>
+                  <div class="p-4">
+                    <p class="text-[10px] uppercase tracking-wider font-bold text-[#A4A88A]">${photo.album || 'Memories'}</p>
+                    <h3 class="font-serif text-sm font-bold text-[#282824] mt-1">${photo.title || 'Untitled memory'}</h3>
+                  </div>
+                </a>
+              `).join('')
+            : `
+              <div class="sm:col-span-2 lg:col-span-3 text-center py-10 bg-white rounded-xl border border-[#A4A88A]/30">
+                <p class="font-serif text-base font-bold text-[#282824]">No photos shared yet</p>
+                <p class="text-xs text-[#282824]/60 mt-1">Add the first memory in the Hall of Fame.</p>
+              </div>
+            `;
+        } catch (err) {
+          console.warn('Error loading photos preview:', err);
+        }
       }
     }
 
@@ -556,7 +447,6 @@
     window.addEventListener('chronicles:authReady', refreshHome);
     window.addEventListener('chronicles:authChanged', refreshHome);
     window.addEventListener('chronicles:membersChanged', refreshHome);
-  </script>
   </script>
 </body>
 

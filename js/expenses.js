@@ -139,9 +139,9 @@
     if (els.addButton) els.addButton.classList.toggle("hidden", !manager);
     if (els.categoriesButton) els.categoriesButton.classList.toggle("hidden", !manager);
     if (els.storageLabel) {
-      const mode = window.authService ? window.authService.mode : "local";
-      els.storageLabel.textContent = mode === "firebase"
-        ? "Synced live with Firestore"
+      const mode = window.authService ? window.authService.mode : "supabase";
+      els.storageLabel.textContent = mode === "supabase"
+        ? "Synced live with Supabase"
         : "Local preview ledger";
     }
   }

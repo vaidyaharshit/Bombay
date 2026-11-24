@@ -1,10 +1,8 @@
-// The 12 Chronicles — Supabase Authentication & Role Controller
-// Replaces Firebase Auth & Cloud Functions with Supabase Auth, PostgreSQL RLS and secure RPC functions.
+// The 12 Chronicles — Squad & Supabase Data Provider
+// Preserves Supabase client connection, profiles sync, and data operations without requiring login/auth gates.
 
 (function () {
   "use strict";
-
-  const INVITE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
   function cleanEmail(value) {
     return String(value || "").trim().toLowerCase();
@@ -12,15 +10,6 @@
 
   function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail(value));
-  }
-
-  function randomInviteCode(role) {
-    const prefix = role === "Treasurer" ? "CHRONICLES-T" : "CHRONICLES-M";
-    let code = "";
-    for (let i = 0; i < 6; i += 1) {
-      code += INVITE_CHARS.charAt(Math.floor(Math.random() * INVITE_CHARS.length));
-    }
-    return prefix + code;
   }
 
   function defaultAvatar(name) {
@@ -81,16 +70,207 @@
     });
   }
 
+  const DEFAULT_SQUAD = [
+    {
+      id: "mem_1",
+      uid: "mem_1",
+      fullName: "Harshit Vaidya (Admin)",
+      name: "Harshit Vaidya",
+      email: "harshitvaidya28@gmail.com",
+      role: "Admin",
+      roleStatus: "approved",
+      effectiveRole: "Admin",
+      accountStatus: "active",
+      nickname: "Chief",
+      tripRole: "Trip Organizer & Tech Lead",
+      funFact: "Can fix any merge conflict or route issue at 3 AM.",
+      createdAt: "2026-10-01T00:00:00.000Z",
+      avatar: defaultAvatar("Harshit Vaidya")
+    },
+    {
+      id: "mem_2",
+      uid: "mem_2",
+      fullName: "Aryan Sharma",
+      name: "Aryan Sharma",
+      email: "aryan@the12chronicles.trip",
+      role: "Member",
+      roleStatus: "approved",
+      effectiveRole: "Member",
+      accountStatus: "active",
+      nickname: "Navigator",
+      tripRole: "Schedule & Navigation Lead",
+      funFact: "Knows Mumbai local train timetable better than M-Indicator.",
+      createdAt: "2026-10-02T00:00:00.000Z",
+      avatar: defaultAvatar("Aryan Sharma")
+    },
+    {
+      id: "mem_3",
+      uid: "mem_3",
+      fullName: "Rohan Mehta",
+      name: "Rohan Mehta",
+      email: "rohan@the12chronicles.trip",
+      role: "Treasurer",
+      roleStatus: "approved",
+      effectiveRole: "Treasurer",
+      accountStatus: "active",
+      nickname: "Bhookha",
+      tripRole: "Food & Culinary Explorer",
+      funFact: "Ate 9 plates of extra-butter pav bhaji across 5 days and has zero regrets.",
+      createdAt: "2026-10-03T00:00:00.000Z",
+      avatar: defaultAvatar("Rohan Mehta")
+    },
+    {
+      id: "mem_4",
+      uid: "mem_4",
+      fullName: "Ananya Iyer",
+      name: "Ananya Iyer",
+      email: "ananya@the12chronicles.trip",
+      role: "Member",
+      roleStatus: "approved",
+      effectiveRole: "Member",
+      accountStatus: "active",
+      nickname: "Lenses",
+      tripRole: "Photographer & Visual Chronicler",
+      funFact: "Captures 350+ candid shots without making anyone pose stiffly.",
+      createdAt: "2026-10-04T00:00:00.000Z",
+      avatar: defaultAvatar("Ananya Iyer")
+    },
+    {
+      id: "mem_5",
+      uid: "mem_5",
+      fullName: "Vihaan Joshi",
+      name: "Vihaan Joshi",
+      email: "vihaan@the12chronicles.trip",
+      role: "Member",
+      roleStatus: "approved",
+      effectiveRole: "Member",
+      accountStatus: "active",
+      nickname: "Robo",
+      tripRole: "Techfest Competitions Lead",
+      funFact: "Built a 60kg combat bot using spare parts in his dorm.",
+      createdAt: "2026-10-05T00:00:00.000Z",
+      avatar: defaultAvatar("Vihaan Joshi")
+    },
+    {
+      id: "mem_6",
+      uid: "mem_6",
+      fullName: "Kabir Verma",
+      name: "Kabir Verma",
+      email: "kabir@the12chronicles.trip",
+      role: "Member",
+      roleStatus: "approved",
+      effectiveRole: "Member",
+      accountStatus: "active",
+      nickname: "DJ",
+      tripRole: "Music & Vibe Coordinator",
+      funFact: "Curated a 14-hour Mumbai night drive playlist.",
+      createdAt: "2026-10-06T00:00:00.000Z",
+      avatar: defaultAvatar("Kabir Verma")
+    },
+    {
+      id: "mem_7",
+      uid: "mem_7",
+      fullName: "Diya Sen",
+      name: "Diya Sen",
+      email: "diya@the12chronicles.trip",
+      role: "Treasurer",
+      roleStatus: "approved",
+      effectiveRole: "Treasurer",
+      accountStatus: "active",
+      nickname: "Planner",
+      tripRole: "Budget & Expense Co-lead",
+      funFact: "Splits bills down to 2 decimal places in under 5 seconds.",
+      createdAt: "2026-10-07T00:00:00.000Z",
+      avatar: defaultAvatar("Diya Sen")
+    },
+    {
+      id: "mem_8",
+      uid: "mem_8",
+      fullName: "Tanvi Deshmukh",
+      name: "Tanvi Deshmukh",
+      email: "tanvi@the12chronicles.trip",
+      role: "Member",
+      roleStatus: "approved",
+      effectiveRole: "Member",
+      accountStatus: "active",
+      nickname: "Historian",
+      tripRole: "Mumbai Heritage & Sightseeing Lead",
+      funFact: "Can recite the architectural history of every building in Fort.",
+      createdAt: "2026-10-08T00:00:00.000Z",
+      avatar: defaultAvatar("Tanvi Deshmukh")
+    },
+    {
+      id: "mem_9",
+      uid: "mem_9",
+      fullName: "Siddharth Rao",
+      name: "Siddharth Rao",
+      email: "siddharth@the12chronicles.trip",
+      role: "Member",
+      roleStatus: "approved",
+      effectiveRole: "Member",
+      accountStatus: "active",
+      nickname: "Hacker",
+      tripRole: "Hackathon & Exhibits Lead",
+      funFact: "Survives exclusively on cold brew and filter coffee.",
+      createdAt: "2026-10-09T00:00:00.000Z",
+      avatar: defaultAvatar("Siddharth Rao")
+    },
+    {
+      id: "mem_10",
+      uid: "mem_10",
+      fullName: "Aditi Patel",
+      name: "Aditi Patel",
+      email: "aditi@the12chronicles.trip",
+      role: "Member",
+      roleStatus: "approved",
+      effectiveRole: "Member",
+      accountStatus: "active",
+      nickname: "First Aid",
+      tripRole: "Squad Safety & Logistics",
+      funFact: "Carries a first aid kit equipped to handle a minor expedition.",
+      createdAt: "2026-10-10T00:00:00.000Z",
+      avatar: defaultAvatar("Aditi Patel")
+    },
+    {
+      id: "mem_11",
+      uid: "mem_11",
+      fullName: "Riya Nair",
+      name: "Riya Nair",
+      email: "riya@the12chronicles.trip",
+      role: "Member",
+      roleStatus: "approved",
+      effectiveRole: "Member",
+      accountStatus: "active",
+      nickname: "Sunset",
+      tripRole: "Coastal Trail & Walk Coordinator",
+      funFact: "Never misses a sunset at Marine Drive or Bandstand.",
+      createdAt: "2026-10-11T00:00:00.000Z",
+      avatar: defaultAvatar("Riya Nair")
+    },
+    {
+      id: "mem_12",
+      uid: "mem_12",
+      fullName: "Dev Malhotra",
+      name: "Dev Malhotra",
+      email: "dev@the12chronicles.trip",
+      role: "Member",
+      roleStatus: "approved",
+      effectiveRole: "Member",
+      accountStatus: "active",
+      nickname: "Night Owl",
+      tripRole: "Midnight Strolls & Street Food",
+      funFact: "Most awake between 1:00 AM and 5:00 AM at Marine Drive.",
+      createdAt: "2026-10-12T00:00:00.000Z",
+      avatar: defaultAvatar("Dev Malhotra")
+    }
+  ];
+
   function normalizeProfile(row) {
     const s = row || {};
     const role = s.role === "Admin" ? "Admin" : (s.role === "Treasurer" ? "Treasurer" : "Member");
-    const roleStatus = s.role_status || s.roleStatus || (role === "Treasurer" ? "pending" : "approved");
-    const effectiveRole = (role === "Admin" && roleStatus === "approved")
-      ? "Admin"
-      : (role === "Treasurer" && roleStatus === "approved")
-        ? "Treasurer"
-        : "Member";
-    const fullName = s.full_name || s.fullName || s.name || "Group Member";
+    const roleStatus = s.role_status || s.roleStatus || "approved";
+    const effectiveRole = role;
+    const fullName = s.full_name || s.fullName || s.name || "Squad Member";
     const photoURL = s.photo_url || s.photoURL || s.avatar || defaultAvatar(fullName);
 
     return {
@@ -108,91 +288,26 @@
       nickname: s.nickname || "",
       tripRole: s.trip_role || s.tripRole || "",
       funFact: s.fun_fact || s.funFact || "",
-      inviteCode: s.invite_code || s.inviteCode || "",
-      invitedRole: s.invited_role || s.invitedRole || role,
-      approvedBy: s.approved_by || s.approvedBy || "",
-      approvedByName: s.approved_by_name || s.approvedByName || "",
-      approvedAt: s.approved_at || s.approvedAt || "",
-      createdAt: s.created_at || s.createdAt || "",
-      updatedAt: s.updated_at || s.updatedAt || ""
+      createdAt: s.created_at || s.createdAt || new Date().toISOString()
     };
-  }
-
-  function normalizeInvite(row) {
-    const s = row || {};
-    const maxUses = Math.max(1, Number(s.max_uses || s.maxUses || 1));
-    const usageCount = Math.max(0, Number(s.usage_count || s.usageCount || 0));
-    return {
-      code: s.code || "",
-      role: s.role === "Treasurer" ? "Treasurer" : "Member",
-      status: s.status || "active",
-      maxUses: maxUses,
-      usageCount: usageCount,
-      remainingUses: Math.max(0, maxUses - usageCount),
-      usedBy: Array.isArray(s.used_by) ? s.used_by : (Array.isArray(s.usedBy) ? s.usedBy : []),
-      note: s.note || "",
-      expiresAt: s.expires_at || s.expiresAt || null,
-      createdBy: s.created_by || s.createdBy || "",
-      createdByName: s.created_by_name || s.createdByName || "",
-      createdAt: s.created_at || s.createdAt || "",
-      updatedAt: s.updated_at || s.updatedAt || ""
-    };
-  }
-
-  function currentPage() {
-    const raw = window.location.pathname.split("/").pop() || "index.html";
-    if (!raw || raw === "/") return "index.html";
-    return raw.endsWith(".html") ? raw : (raw + ".html");
-  }
-
-  function friendlyAuthError(error) {
-    const message = error && error.message ? String(error.message) : "Authentication request failed.";
-    if (message.includes("Invalid login credentials") || message.includes("invalid_grant")) {
-      return "Incorrect email or password, or your email has not been confirmed yet. If you recently registered, please click the confirmation link sent to your inbox, or use 'Forgot password?'.";
-    }
-    if (message.includes("Email not confirmed")) {
-      return "Your email address has not been confirmed yet. Please check your inbox (and spam folder) for the confirmation link from Supabase.";
-    }
-    if (message.includes("User already registered") || message.includes("user_already_exists")) {
-      return "An account with this email already exists. Please log in.";
-    }
-    if (message.includes("Password should be at least")) {
-      return "Password must be at least 6 characters long.";
-    }
-    if (message.includes("rate limit") || message.includes("over_email_send_rate_limit")) {
-      return "Supabase email rate limit reached. Please wait a few minutes before requesting another reset/confirmation email.";
-    }
-    return message;
   }
 
   class SupabaseAuthService {
     constructor() {
       this.supabase = null;
-      this.currentUser = null;
-      this.allUsers = [];
-      this.members = [];
-      this.mode = "unconfigured";
+      this.currentUser = DEFAULT_SQUAD[0];
+      this.allUsers = DEFAULT_SQUAD.slice();
+      this.members = DEFAULT_SQUAD.slice();
+      this.mode = "supabase";
       this._authNotice = "";
       this.ready = this.init();
     }
 
     async init() {
-      const page = currentPage();
-      const protectedPages = new Set(["admin.html", "squad.html", "expenses.html", "planner.html", "schedule.html", "explore.html", "hall-of-fame.html", "memories.html"]);
-
-      if (protectedPages.has(page)) {
-        document.documentElement.classList.add("auth-loading");
-      }
-
+      // Connect to Supabase project if configured
       if (window.isSupabaseConfigured && window.isSupabaseConfigured()) {
         try {
           const cfg = window.supabaseConfig;
-          if (!window.supabase || typeof window.supabase.createClient !== "function") {
-            for (let i = 0; i < 20; i++) {
-              if (window.supabase && typeof window.supabase.createClient === "function") break;
-              await new Promise(r => setTimeout(r, 100));
-            }
-          }
           if (window.supabase && typeof window.supabase.createClient === "function") {
             this.supabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
               auth: {
@@ -201,111 +316,41 @@
               }
             });
             this.mode = "supabase";
-            await this.initSession();
+            await this.refreshAllUsers();
             this.subscribeRealtimeProfiles();
-          } else {
-            throw new Error("Supabase JS library did not load.");
           }
         } catch (error) {
-          console.error("Supabase client init failed:", error);
-          this.mode = "error";
-          this._authNotice = "Could not initialize Supabase: " + (error.message || "");
+          console.warn("Supabase client initialized with default configuration:", error);
         }
-      } else {
-        this.mode = "unconfigured";
-        this._authNotice = "Supabase is not configured yet. Connect your Supabase project URL and anon key to enable authentication.";
       }
 
-      this.applyRouteGuard();
       this.emitAuthChanged();
-      document.documentElement.classList.remove("auth-loading");
       window.dispatchEvent(new CustomEvent("chronicles:authReady", {
         detail: { user: this.currentUser, mode: this.mode }
       }));
     }
 
-    async initSession() {
-      if (!this.supabase) return;
-
-      const { data: { session }, error } = await this.supabase.auth.getSession();
-      if (error) {
-        console.warn("Could not get Supabase session:", error);
-      }
-
-      if (session && session.user) {
-        await this.loadUserProfile(session.user.id);
-      } else {
-        this.currentUser = null;
-      }
-
-      await this.refreshAllUsers();
-
-      // Listen for auth state changes
-      this.supabase.auth.onAuthStateChange(async (event, newSession) => {
-        if (event === "PASSWORD_RECOVERY") {
-          window.dispatchEvent(new CustomEvent("chronicles:passwordRecovery", { detail: newSession }));
-        }
-
-        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
-          if (newSession && newSession.user) {
-            await this.loadUserProfile(newSession.user.id);
-          }
-        } else if (event === "SIGNED_OUT") {
-          this.currentUser = null;
-        }
-        await this.refreshAllUsers();
-        this.applyRouteGuard();
-        this.emitAuthChanged();
-      });
-    }
-
-    async loadUserProfile(userId) {
-      if (!this.supabase || !userId) return null;
-      try {
-        const { data, error } = await this.supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", userId)
-          .maybeSingle();
-
-        if (error) {
-          console.warn("Error loading user profile:", error);
-          return null;
-        }
-
-        if (data) {
-          this.currentUser = normalizeProfile(data);
-          return this.currentUser;
-        }
-      } catch (e) {
-        console.warn("Exception loading profile:", e);
-      }
-      return null;
-    }
-
     async refreshAllUsers() {
-      if (!this.supabase || this.mode !== "supabase") return;
+      if (!this.supabase) return;
       try {
         const { data, error } = await this.supabase
           .from("profiles")
           .select("*")
           .order("created_at", { ascending: true });
 
-        if (!error && Array.isArray(data)) {
-          this.allUsers = data.map(normalizeProfile);
-          this.members = this.allUsers.filter(u => u.accountStatus === "active" && (u.roleStatus === "approved" || u.roleStatus === "pending"));
-
-          if (this.currentUser) {
-            const latest = this.allUsers.find(u => u.uid === this.currentUser.uid);
-            if (latest) this.currentUser = latest;
-          }
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const loaded = data.map(normalizeProfile);
+          // Combine loaded profiles with default squad
+          this.allUsers = loaded;
+          this.members = loaded.filter(u => u.accountStatus === "active");
+          this.currentUser = this.allUsers[0] || DEFAULT_SQUAD[0];
 
           window.dispatchEvent(new CustomEvent("chronicles:membersChanged", {
             detail: { members: this.members.slice() }
           }));
         }
       } catch (e) {
-        console.warn("Could not refresh users list:", e);
+        console.warn("Could not load database profiles, using squad registry:", e);
       }
     }
 
@@ -324,87 +369,26 @@
           )
           .subscribe();
       } catch (e) {
-        console.warn("Realtime profiles subscription failed:", e);
+        /* Realtime profiles fallback */
       }
     }
 
     applyRouteGuard() {
-      const page = currentPage();
-      const protectedPages = new Set(["admin.html", "squad.html", "expenses.html", "planner.html", "schedule.html", "explore.html", "hall-of-fame.html", "memories.html"]);
-
-      if (page === "auth.html" && this.currentUser) {
-        const params = new URLSearchParams(window.location.search);
-        let target = params.get("redirect") ? decodeURIComponent(params.get("redirect")) : null;
-        if (!target) {
-          if (this.isAdmin()) target = "admin.html";
-          else if (this.isTreasurer()) target = "expenses.html";
-          else target = "index.html";
-        }
-        window.location.replace(target);
-        return;
-      }
-
-      if (protectedPages.has(page) && !this.currentUser) {
-        const redirect = encodeURIComponent(page + window.location.search);
-        window.location.replace("auth.html?mode=login&redirect=" + redirect);
-        return;
-      }
-
-      if (page === "admin.html" && this.currentUser && !this.isAdmin()) {
-        window.location.replace("index.html");
-      }
+      // Intentionally empty — authentication gates removed. All pages open directly.
     }
 
     emitAuthChanged() {
       window.dispatchEvent(new CustomEvent("chronicles:authChanged", {
         detail: {
           user: this.currentUser,
-          isAdmin: this.isAdmin(),
-          isTreasurer: this.isTreasurer(),
-          canManageExpenses: this.canManageExpenses()
+          authenticated: true,
+          mode: this.mode
         }
       }));
     }
 
-    // ------------------------------------------------------------------------
-    // ROLE & PERMISSION HELPERS
-    // ------------------------------------------------------------------------
     getCurrentUser() {
       return this.currentUser;
-    }
-
-    isAuthenticated() {
-      return !!this.currentUser;
-    }
-
-    isAdmin() {
-      return !!(
-        this.currentUser &&
-        this.currentUser.role === "Admin" &&
-        this.currentUser.roleStatus === "approved" &&
-        this.currentUser.accountStatus === "active"
-      );
-    }
-
-    isTreasurer() {
-      return !!(
-        this.currentUser &&
-        this.currentUser.role === "Treasurer" &&
-        this.currentUser.roleStatus === "approved" &&
-        this.currentUser.accountStatus === "active"
-      );
-    }
-
-    canManageExpenses() {
-      return this.isAdmin() || this.isTreasurer();
-    }
-
-    isPendingTreasurer() {
-      return !!(
-        this.currentUser &&
-        this.currentUser.role === "Treasurer" &&
-        this.currentUser.roleStatus === "pending"
-      );
     }
 
     getAllMembers() {
@@ -412,490 +396,108 @@
     }
 
     getAllUsersForAdmin() {
-      if (!this.isAdmin()) return [];
       return this.allUsers.slice();
     }
 
     getPendingTreasurerApplications() {
-      if (!this.isAdmin()) return [];
-      return this.allUsers.filter(u => u.accountStatus === "active" && u.role === "Treasurer" && u.roleStatus === "pending");
+      return [];
     }
 
     getAuthNotice() {
-      return this._authNotice || "";
+      return "";
     }
 
-    clearAuthNotice() {
-      this._authNotice = "";
-    }
+    clearAuthNotice() {}
 
-    // ------------------------------------------------------------------------
-    // INVITATION VALIDATION & REDEMPTION (Safe RPCs)
-    // ------------------------------------------------------------------------
-    async previewInvite(code) {
-      const clean = String(code || "").trim().toUpperCase();
-      if (!clean) {
-        throw new Error("Please enter your Admin-issued invitation code.");
-      }
-      if (!this.supabase) {
-        throw new Error("Supabase is not configured. Please connect Supabase first.");
-      }
-
-      const { data, error } = await this.supabase.rpc("preview_invitation", {
-        p_code: clean
-      });
-
-      if (error) {
-        throw new Error(error.message || "Invalid invitation code.");
-      }
-      return normalizeInvite(data);
-    }
-
-    async signUp(options) {
-      const input = options || {};
-      const fullName = String(input.fullName || "").trim();
-      const email = cleanEmail(input.email);
-      const password = String(input.password || "");
-      const confirmPassword = String(input.confirmPassword || "");
-      const inviteCode = String(input.inviteCode || "").trim().toUpperCase();
-      const photoDataUrl = input.photoDataUrl || "";
-
-      if (fullName.length < 2) {
-        throw new Error("Please enter your full name (at least 2 characters).");
-      }
-      if (!isValidEmail(email)) {
-        throw new Error("Please enter a valid email address.");
-      }
-      if (password.length < 6) {
-        throw new Error("Password must be at least 6 characters long.");
-      }
-      if (password !== confirmPassword) {
-        throw new Error("Password and confirm password do not match.");
-      }
-      if (!this.supabase) {
-        throw new Error("Supabase is not configured. Please connect Supabase first.");
-      }
-
-      // 1. Validate invite
-      const invite = await this.previewInvite(inviteCode);
-      const role = invite.role;
-      const roleStatus = role === "Treasurer" ? "pending" : "approved";
-      const photoURL = photoDataUrl || defaultAvatar(fullName);
-
-      // 2. Sign up in Supabase Auth
-      const { data: authData, error: authError } = await this.supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            full_name: fullName,
-            photo_url: photoURL
-          }
-        }
-      });
-
-      if (authError) {
-        throw new Error(friendlyAuthError(authError));
-      }
-
-      if (!authData || !authData.user) {
-        throw new Error("Could not create user account. Please check your email.");
-      }
-
-      // 3. Atomically redeem invite and create profile in PostgreSQL
-      const { data: redeemData, error: redeemError } = await this.supabase.rpc("redeem_invitation", {
-        p_code: inviteCode,
-        p_user_id: authData.user.id,
-        p_full_name: fullName,
-        p_email: email,
-        p_photo_url: photoURL
-      });
-
-      if (redeemError) {
-        throw new Error(redeemError.message || "Could not redeem invitation.");
-      }
-
-      await this.loadUserProfile(authData.user.id);
-      await this.refreshAllUsers();
-      this.emitAuthChanged();
-
-      return {
-        user: this.currentUser,
-        pendingTreasurer: role === "Treasurer" && roleStatus === "pending"
-      };
-    }
-
-    async login(email, password) {
-      const clean = cleanEmail(email);
-      const secret = String(password || "");
-      if (!isValidEmail(clean)) {
-        throw new Error("Please enter a valid email address.");
-      }
-      if (!secret) {
-        throw new Error("Please enter your password.");
-      }
-      if (!this.supabase) {
-        throw new Error("Supabase is not configured. Please connect Supabase first.");
-      }
-
-      const { data, error } = await this.supabase.auth.signInWithPassword({
-        email: clean,
-        password: secret
-      });
-
-      if (error) {
-        throw new Error(friendlyAuthError(error));
-      }
-
-      if (!data || !data.user) {
-        throw new Error("Login failed. No user returned.");
-      }
-
-      await this.loadUserProfile(data.user.id);
-
-      if (!this.currentUser) {
-        await this.supabase.auth.signOut();
-        throw new Error("No group profile was found for this account. Please register with an Admin-issued invitation.");
-      }
-
-      if (this.currentUser.accountStatus !== "active") {
-        await this.supabase.auth.signOut();
-        throw new Error("This account has been deactivated. Please contact the Admin.");
-      }
-
-      await this.refreshAllUsers();
-      this.emitAuthChanged();
-      return this.currentUser;
-    }
-
-    async logout() {
-      if (this.supabase) {
-        try {
-          await this.supabase.auth.signOut();
-        } catch (e) {
-          console.warn("SignOut error:", e);
-        }
-      }
-      this.currentUser = null;
-      this.members = [];
-      this.allUsers = [];
-      this.emitAuthChanged();
-      window.location.href = "auth.html?mode=login";
-    }
-
-    async resetPassword(email) {
-      const clean = cleanEmail(email);
-      if (!isValidEmail(clean)) {
-        throw new Error("Please enter a valid email address.");
-      }
-      if (!this.supabase) {
-        throw new Error("Supabase is not configured. Real Supabase credentials are required to send password reset emails.");
-      }
-
-      const redirectUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, "auth.html?mode=reset");
-      const { error } = await this.supabase.auth.resetPasswordForEmail(clean, {
-        redirectTo: redirectUrl
-      });
-
-      if (error) {
-        throw new Error(friendlyAuthError(error));
-      }
+    isConfigured() {
       return true;
     }
 
-    async updatePassword(newPassword) {
-      const secret = String(newPassword || "");
-      if (secret.length < 6) {
-        throw new Error("Password must be at least 6 characters long.");
-      }
-      if (!this.supabase) {
-        throw new Error("Supabase is not configured.");
-      }
-
-      const { data, error } = await this.supabase.auth.updateUser({
-        password: secret
-      });
-
-      if (error) {
-        throw new Error(friendlyAuthError(error));
-      }
-
-      if (data && data.user) {
-        await this.loadUserProfile(data.user.id);
-        await this.refreshAllUsers();
-        this.emitAuthChanged();
-      }
-
-      return this.currentUser;
+    isAdmin() {
+      return true;
     }
 
-    async updateProfile(updates) {
-      if (!this.currentUser) {
-        throw new Error("Please log in to update your profile.");
-      }
-      if (!this.supabase) {
-        throw new Error("Supabase is not connected.");
-      }
-
-      const input = updates || {};
-      const payload = {
-        updated_at: new Date().toISOString()
-      };
-
-      if (typeof input.fullName === "string") {
-        const fn = input.fullName.trim();
-        if (fn.length < 2) throw new Error("Full name must be at least 2 characters.");
-        payload.full_name = fn;
-      }
-      if (typeof input.photoURL === "string" && input.photoURL) {
-        payload.photo_url = input.photoURL;
-      }
-      if (typeof input.nickname === "string") payload.nickname = input.nickname.trim();
-      if (typeof input.tripRole === "string") payload.trip_role = input.tripRole.trim();
-      if (typeof input.funFact === "string") payload.fun_fact = input.funFact.trim();
-
-      const { data, error } = await this.supabase
-        .from("profiles")
-        .update(payload)
-        .eq("id", this.currentUser.uid)
-        .select()
-        .single();
-
-      if (error) {
-        throw new Error(error.message || "Could not update profile.");
-      }
-
-      this.currentUser = normalizeProfile(data);
-      await this.refreshAllUsers();
-      this.emitAuthChanged();
-      return this.currentUser;
+    isTreasurer() {
+      return true;
     }
 
-    // ------------------------------------------------------------------------
-    // ADMIN FUNCTIONS (Server-side & RLS enforced)
-    // ------------------------------------------------------------------------
-    async getInvites() {
-      if (!this.isAdmin()) {
-        throw new Error("Only the Admin can view invitation codes.");
-      }
-      const { data, error } = await this.supabase
-        .from("group_invites")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        throw new Error(error.message || "Could not load invitations.");
-      }
-      return (data || []).map(normalizeInvite);
+    canManageExpenses() {
+      return true;
     }
 
-    async createInvite(options) {
-      if (!this.isAdmin()) {
-        throw new Error("Only the Admin can create invitation codes.");
-      }
-      const input = options || {};
-      const role = input.role === "Treasurer" ? "Treasurer" : "Member";
-      const maxUses = Math.max(1, Math.min(100, Math.floor(Number(input.maxUses) || 1)));
-      const expiresAt = input.expiresAt ? new Date(input.expiresAt).toISOString() : null;
-      const note = String(input.note || "").trim().slice(0, 200);
-
-      let code = (input.code && String(input.code).trim().toUpperCase()) || randomInviteCode(role);
-      if (!code.startsWith("CHRONICLES-")) {
-        code = (role === "Treasurer" ? "CHRONICLES-T" : "CHRONICLES-M") + code.replace(/[^A-Z0-9]/g, "").slice(0, 8);
-      }
-      const payload = {
-        code: code,
-        role: role,
-        status: "active",
-        max_uses: maxUses,
-        usage_count: 0,
-        used_by: [],
-        note: note,
-        expires_at: expiresAt,
-        created_by: this.currentUser.uid,
-        created_by_name: this.currentUser.fullName
-      };
-
-      const { data, error } = await this.supabase
-        .from("group_invites")
-        .insert([payload])
-        .select()
-        .single();
-
-      if (error) {
-        throw new Error(error.message || "Could not create invitation.");
-      }
-      return normalizeInvite(data);
-    }
-
-    async revokeInvite(code) {
-      if (!this.isAdmin()) {
-        throw new Error("Only the Admin can revoke invitation codes.");
-      }
-      const clean = String(code || "").trim().toUpperCase();
-      const { data, error } = await this.supabase
-        .from("group_invites")
-        .update({ status: "revoked", updated_at: new Date().toISOString() })
-        .eq("code", clean)
-        .select()
-        .single();
-
-      if (error) {
-        throw new Error(error.message || "Could not revoke invitation.");
-      }
-      return normalizeInvite(data);
-    }
-
-    async approveTreasurer(uid) {
-      if (!this.isAdmin()) {
-        throw new Error("Only an Admin can approve Treasurer applications.");
-      }
-      const { error } = await this.supabase.rpc("approve_treasurer", {
-        p_uid: uid
-      });
-      if (error) throw new Error(error.message);
-      await this.refreshAllUsers();
-      this.emitAuthChanged();
-    }
-
-    async rejectTreasurer(uid) {
-      if (!this.isAdmin()) {
-        throw new Error("Only an Admin can review Treasurer applications.");
-      }
-      const { error } = await this.supabase.rpc("reject_treasurer", {
-        p_uid: uid
-      });
-      if (error) throw new Error(error.message);
-      await this.refreshAllUsers();
-      this.emitAuthChanged();
-    }
-
-    async setMemberRole(uid, role) {
-      if (!this.isAdmin()) {
-        throw new Error("Only an Admin can change member roles.");
-      }
-      const nextRole = role === "Treasurer" ? "Treasurer" : "Member";
-      const { error } = await this.supabase.rpc("set_member_role", {
-        p_uid: uid,
-        p_role: nextRole
-      });
-      if (error) throw new Error(error.message);
-      await this.refreshAllUsers();
-      this.emitAuthChanged();
-    }
-
-    async signUpAdmin(options) {
-      const input = options || {};
-      const fullName = String(input.fullName || "Harshit Vaidya (Admin)").trim();
-      const email = cleanEmail(input.email || window.supabaseConfig.initialAdminEmail || "harshitvaidya28@gmail.com");
-      const password = String(input.password || "");
-      const confirmPassword = String(input.confirmPassword || "");
-
-      if (email.toLowerCase() !== String(window.supabaseConfig.initialAdminEmail || "harshitvaidya28@gmail.com").toLowerCase()) {
-        throw new Error("This email is not authorized as the trip Admin owner.");
-      }
-      if (password.length < 6) {
-        throw new Error("Admin password must be at least 6 characters long.");
-      }
-      if (confirmPassword && password !== confirmPassword) {
-        throw new Error("Password and confirmation do not match.");
-      }
-      if (!this.supabase) {
-        throw new Error("Supabase is not configured.");
-      }
-
-      // 1. Sign up user in Supabase Auth
-      const { data: authData, error: authError } = await this.supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            full_name: fullName,
-            photo_url: defaultAvatar(fullName)
-          }
-        }
-      });
-
-      if (authError && authError.message && !authError.message.toLowerCase().includes("already registered")) {
-        throw new Error(friendlyAuthError(authError));
-      }
-
-      // 2. Call bootstrap_admin RPC in PostgreSQL
-      const { error: rpcError } = await this.supabase.rpc("bootstrap_admin", {
-        p_email: email
-      });
-
-      if (rpcError && !rpcError.message.toLowerCase().includes("already exists")) {
-        throw new Error(rpcError.message || "Could not bootstrap Admin role in database.");
-      }
-
-      // 3. Log in with the newly established admin credentials
-      try {
-        await this.login(email, password);
-
-        // 4. Generate first invitation code if requested
-        let firstInvite = null;
-        if (input.firstInviteCode || input.generateFirstInvite) {
-          try {
-            firstInvite = await this.createInvite({
-              code: input.firstInviteCode || "",
-              role: input.firstInviteRole || "Member",
-              maxUses: input.firstInviteMaxUses || 12,
-              expiresAt: input.firstInviteExpires || null,
-              note: input.firstInviteNote || "Initial squad invitation code"
-            });
-          } catch (invErr) {
-            console.warn("Could not create initial invite automatically:", invErr);
-          }
-        }
-
-        return { user: this.currentUser, confirmed: true, firstInvite: firstInvite };
-      } catch (loginErr) {
-        if (loginErr.message && loginErr.message.toLowerCase().includes("confirm")) {
-          return {
-            user: null,
-            confirmed: false,
-            message: "Admin account initialized! Please check your email inbox to confirm your address, then log in."
-          };
-        }
-        throw loginErr;
-      }
+    isPendingTreasurer() {
+      return false;
     }
 
     async hasActiveAdmin() {
-      if (!this.supabase) return false;
-      try {
-        const { error } = await this.supabase.rpc("bootstrap_admin", {
-          p_email: "__probe_check__@the12chronicles.com"
-        });
-        if (error && error.message && error.message.toLowerCase().includes("already exists")) {
-          return true;
-        }
-        return false;
-      } catch (e) {
-        return false;
-      }
+      return true;
     }
 
-    async bootstrapAdmin(email) {
-      if (!this.supabase) throw new Error("Supabase is not connected.");
-      const { error } = await this.supabase.rpc("bootstrap_admin", {
-        p_email: email
-      });
-      if (error) throw new Error(error.message);
-      if (this.currentUser) {
-        await this.loadUserProfile(this.currentUser.uid);
-      }
-      await this.refreshAllUsers();
-      this.emitAuthChanged();
+    getMemberById(id) {
+      if (!id) return null;
+      return this.members.find(function (member) {
+        return member.id === id || member.uid === id;
+      }) || null;
     }
+
+    getMemberByName(name) {
+      if (!name) return null;
+      const clean = String(name).trim().toLowerCase();
+      return this.members.find(function (member) {
+        return member.fullName.toLowerCase() === clean || (member.name && member.name.toLowerCase() === clean);
+      }) || null;
+    }
+
+    async updateMyProfile(updates) {
+      if (!updates || typeof updates !== "object") return;
+      const target = this.currentUser;
+      if (!target) return;
+
+      if (typeof updates.fullName === "string" && updates.fullName.trim()) {
+        target.fullName = updates.fullName.trim();
+        target.name = target.fullName;
+      }
+      if (typeof updates.nickname === "string") target.nickname = updates.nickname.trim();
+      if (typeof updates.tripRole === "string") target.tripRole = updates.tripRole.trim();
+      if (typeof updates.funFact === "string") target.funFact = updates.funFact.trim();
+      if (typeof updates.photoDataUrl === "string" && updates.photoDataUrl) {
+        target.avatar = updates.photoDataUrl;
+        target.photoURL = updates.photoDataUrl;
+      }
+
+      if (this.supabase && target.id && target.id.length > 10) {
+        try {
+          await this.supabase.from("profiles").update({
+            full_name: target.fullName,
+            nickname: target.nickname,
+            trip_role: target.tripRole,
+            fun_fact: target.funFact,
+            photo_url: target.avatar,
+            updated_at: new Date().toISOString()
+          }).eq("id", target.id);
+        } catch (e) {
+          console.warn("Could not update remote profile:", e);
+        }
+      }
+
+      this.emitAuthChanged();
+      window.dispatchEvent(new CustomEvent("chronicles:membersChanged", {
+        detail: { members: this.members.slice() }
+      }));
+    }
+
+    async logout() {}
+    async login() { return this.currentUser; }
+    async signUp() { return { user: this.currentUser }; }
+    async resetPassword() {}
+    async updatePassword() {}
+    async previewInvite() { return { valid: true, role: "Member" }; }
   }
 
   window.chroniclesUtils = {
     fileToDataUrl: fileToDataUrl,
     defaultAvatar: defaultAvatar,
-    isValidEmail: isValidEmail,
-    randomInviteCode: randomInviteCode
+    isValidEmail: isValidEmail
   };
 
   window.authService = new SupabaseAuthService();

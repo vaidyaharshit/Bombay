@@ -317,11 +317,6 @@ input[type="checkbox"].journal-checkbox {
   }
 }
 
-/* Auth gate: avoid flashing protected content before the session resolves */
-html.auth-loading body {
-  visibility: hidden;
-}
-
 .auth-role-pill {
   letter-spacing: 0.04em;
 }
